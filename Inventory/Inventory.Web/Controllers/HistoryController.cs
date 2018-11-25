@@ -13,117 +13,72 @@ using System.Web.UI;
 
 namespace Inventory.Web.Controllers
 {
-    public class HistoryController : Controller
+    public class HistoryController : BaseController
     {
-        private IHistoryService HistoryService;
-        private IStatusTypeService StatusTypeService;
-        private IRepairPlaceService RepairPlaceService;
-        private IEquipmentService EquipmentService;
-        private IEmployeeService EmployeeService;
-
-        public HistoryController(IHistoryService historyService, IStatusTypeService statusTypeService, IRepairPlaceService repairPlaceService, IEquipmentService equipmentService, IEmployeeService employeeService)
-        {
-            HistoryService = historyService;
-            StatusTypeService = statusTypeService;
-            RepairPlaceService = repairPlaceService;
-            EquipmentService = equipmentService;
-            EmployeeService = employeeService;
-        }
+        private const int ItemsPerPage = 10;
+        public HistoryController(
+            IHistoryService historyService,
+            IStatusTypeService statusTypeService,
+            IRepairPlaceService repairPlaceService,
+            IEquipmentService equipmentService,
+            IEmployeeService employeeService) : base(
+            historyService, statusTypeService, repairPlaceService, equipmentService, employeeService) { }
 
         [Authorize(Roles = "admin, manager, user")]
         [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page, string equipmentId, string employeeId, string repairPlaceId, string statusTypeId)
         {
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-
-            List<EquipmentSelectModel> equipmentSelectModel = new List<EquipmentSelectModel>();
-            var equipmentWithInventNumber = EquipmentService.GetAll();
-
-            foreach (var item in equipmentWithInventNumber)
-            {
-                equipmentSelectModel.Add(
-                    new EquipmentSelectModel
-                    {
-                        Id = item.Id,
-                        TypeAndInventNumber = item.EquipmentType.Name + " (Номер: " + item.InventNumber + ")"
-                    }
-                );
-            }
-
-            List<StatusTypeVM> statusTypeVMs = Mapper.Map<IEnumerable<StatusTypeVM>>(StatusTypeService.GetAll()).ToList();
-            ViewBag.StatusTypeId = new SelectList(statusTypeVMs,"Id","Name");
-
-            List<RepairPlaceVM> repairPlaceVMs = Mapper.Map<IEnumerable<RepairPlaceVM>>(RepairPlaceService.GetAll()).ToList();
-            ViewBag.RepairPlaceId = new SelectList(repairPlaceVMs, "Id", "Name");
-
-            ViewBag.EquipmentId = new SelectList(equipmentSelectModel,"Id","TypeAndInventNumber");
-
-            ViewBag.EmployeeId = new SelectList(EmployeeService.GetAll(),"EmployeeId","EmployeeFullName");
+            ViewBag.StatusTypeId = GetStatusTypeIdSelectList();
+            ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList();
+            ViewBag.EquipmentId = GetEquipmentIdSelectList();
+            ViewBag.EmployeeId = GetEmployeeIdSelectList();
 
             IEnumerable<HistoryDTO> historyDTOs = HistoryService.GetAll().ToList();
 
             IEnumerable<HistoryVM> historyVMs = Mapper.Map<IEnumerable<HistoryVM>>(historyDTOs);
 
-            var filteredHistories = (!String.IsNullOrEmpty(equipmentId)) || (!String.IsNullOrEmpty(employeeId)) || (!String.IsNullOrEmpty(repairPlaceId)) || (!String.IsNullOrEmpty(statusTypeId))
-              ? HistoryService.Filter(pageNumber, pageSize, historyDTOs, equipmentId, employeeId, repairPlaceId, statusTypeId).OrderBy(x => x.Employee.EmployeeFullName)
-              : null;
-            
-            return filteredHistories == null ? View(historyVMs.ToPagedList(pageNumber, pageSize)) : View(Mapper.Map<IEnumerable<HistoryVM>>(filteredHistories).ToPagedList(pageNumber, pageSize));
+            FilterParamsDTO parameters = new FilterParamsDTO
+            {
+                EquipmentId = Request.QueryString["equipmentId"],
+                EmployeeId = Request.QueryString["emploeyeId"],
+                RepairPlaceId = Request.QueryString["repairPlaceId"],
+                StatusTypeId = Request.QueryString["statusTypeId"]
+            };
+
+            var filteredHistoryDTOList = HistoryService.GetFilteredList(parameters).ToList();
+            var filteredHistoryVMList = Mapper.Map<IEnumerable<HistoryVM>>(filteredHistoryDTOList);
+
+            return View(filteredHistoryVMList.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]
         public ActionResult Details(Guid? id)
         {
-            if (id == null)
+            try
+            {
+                HistoryDTO historyDTO = HistoryService.Get(id);
+                HistoryVM historyVM = Mapper.Map<HistoryVM>(historyDTO);
+
+                return View(historyVM);
+            }
+            catch (ArgumentNullException)
+            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
-            HistoryDTO historyDTO = HistoryService.Get((Guid)id);
-            if (historyDTO == null)
+            }
+            catch (NotFoundException)
+            {
                 return HttpNotFound();
-
-            HistoryVM historyVM = Mapper.Map<HistoryVM>(historyDTO);
-
-            return View(historyVM);
+            }
         }
 
         [Authorize(Roles = "admin, manager, user")]
         public ActionResult Create()
         {
-            List<EquipmentSelectModel> equipmentSelectModel = new List<EquipmentSelectModel>();
-            var eqipmentWithInventNumber = EquipmentService.GetAll();
-
-            foreach (var item in eqipmentWithInventNumber)
-            {
-                equipmentSelectModel.Add(
-                    new EquipmentSelectModel
-                    {
-                        Id = item.Id,
-                        TypeAndInventNumber = item.EquipmentType.Name + " (Номер: " + item.InventNumber + ")"
-                    }
-                );
-            }
             ViewBag.ChangeDateNow = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-
-            ViewBag.StatusTypeId = new SelectList(
-                StatusTypeService.GetAll(),
-                "Id",
-                "Name");
-
-            ViewBag.RepairPlaceId = new SelectList(
-                RepairPlaceService.GetAll(),
-                "Id",
-                "Name");
-
-            ViewBag.EquipmentId = new SelectList(
-                equipmentSelectModel,
-                "Id",
-                "TypeAndInventNumber");
-
-            ViewBag.EmployeeId = new SelectList(
-                EmployeeService.GetAll(),
-                "EmployeeId",
-                "EmployeeFullName");
+            ViewBag.StatusTypeId = GetStatusTypeIdSelectList();
+            ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList();
+            ViewBag.EquipmentId = GetEquipmentIdSelectList();
+            ViewBag.EmployeeId = GetEmployeeIdSelectList();
 
             return View();
         }
@@ -131,107 +86,49 @@ namespace Inventory.Web.Controllers
         [HttpPost]
         [Authorize(Roles = "admin, manager, user")]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "EquipmentId,ChangeDate,EmployeeId,RepairPlaceId,StatusTypeId,Comments")] HistoryVM historyVM)
+        public ActionResult Create([Bind(Include = "EquipmentId,ChangeDate,EmployeeId,RepairPlaceId,StatusTypeId,Comments")] HistoryVM model)
         {
-            List<EquipmentSelectModel> equipmentSelectModel = new List<EquipmentSelectModel>();
-            var eqipmentWithInventNumber = EquipmentService.GetAll();
-
-            foreach (var item in eqipmentWithInventNumber)
-            {
-                equipmentSelectModel.Add(
-                    new EquipmentSelectModel
-                    {
-                        Id = item.Id,
-                        TypeAndInventNumber = item.EquipmentType.Name + " (Номер: " + item.InventNumber + ")"
-                    }
-                );
-            }
-
             if (ModelState.IsValid)
             {
-                HistoryDTO historyDTO = Mapper.Map<HistoryDTO>(historyVM);
+                HistoryDTO historyDTO = Mapper.Map<HistoryDTO>(model);
                 HistoryService.Add(historyDTO);
 
                 return RedirectToAction("Index");
             }
 
             ViewBag.ChangeDateNow = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+            ViewBag.StatusTypeId = GetStatusTypeIdSelectList(model.StatusTypeId);
+            ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList(model.RepairPlaceId);
+            ViewBag.EquipmentId = GetEquipmentIdSelectList(model.EquipmentId);
+            ViewBag.EmployeeId = GetEmployeeIdSelectList(model.EmployeeId);
 
-            ViewBag.StatusTypeId = new SelectList(
-                StatusTypeService.GetAll(),
-                "Id",
-                "Name");
-
-            ViewBag.RepairPlaceId = new SelectList(
-                RepairPlaceService.GetAll(),
-                "Id",
-                "Name");
-
-            ViewBag.EquipmentId = new SelectList(
-               equipmentSelectModel,
-                "Id",
-                "TypeAndInventNumber");
-
-            ViewBag.EmployeeId = new SelectList(
-                EmployeeService.GetAll(),
-                "EmployeeId",
-                "EmployeeFullName");
-
-            return View(historyVM);
+            return View(model);
         }
 
         [Authorize(Roles = "admin, manager")]
         public ActionResult Edit(Guid? id)
         {
-            if (id == null)
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
-            HistoryDTO historyDTO = HistoryService.Get((Guid)id);
-            if (historyDTO == null)
-                return HttpNotFound();
-
-            HistoryVM historyVM = Mapper.Map<HistoryVM>(historyDTO);
-
-            List<EquipmentSelectModel> equipmentSelectModel = new List<EquipmentSelectModel>();
-            var eqipmentWithInventNumber = EquipmentService.GetAll();
-
-            foreach (var item in eqipmentWithInventNumber)
+            try
             {
-                equipmentSelectModel.Add(
-                    new EquipmentSelectModel
-                    {
-                        Id = item.Id,
-                        TypeAndInventNumber = item.EquipmentType.Name + " (Номер: " + item.InventNumber + ")"
-                    }
-                );
+                HistoryDTO historyDTO = HistoryService.Get(id);
+                HistoryVM historyVM = Mapper.Map<HistoryVM>(historyDTO);
+
+                ViewBag.ChangeDateNow = ((DateTime)historyVM.ChangeDate).ToString("dd.MM.yyyy HH:mm:ss");
+                ViewBag.StatusTypeId = GetStatusTypeIdSelectList(historyVM.StatusTypeId);
+                ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList(historyVM.RepairPlaceId);
+                ViewBag.EquipmentId = GetEquipmentIdSelectList(historyVM.EquipmentId);
+                ViewBag.EmployeeId = GetEmployeeIdSelectList(historyVM.EmployeeId);
+
+                return View(historyVM);
             }
-            ViewBag.ChangeDateNow = ((DateTime)historyVM.ChangeDate).ToString("dd.MM.yyyy HH:mm:ss");
-
-            ViewBag.StatusTypeId = new SelectList(
-                StatusTypeService.GetAll(),
-                "Id",
-                "Name",
-                historyVM.StatusTypeId);
-
-            ViewBag.RepairPlaceId = new SelectList(
-                RepairPlaceService.GetAll(),
-                "Id",
-                "Name",
-                historyVM.RepairPlaceId);
-
-            ViewBag.EquipmentId = new SelectList(
-                equipmentSelectModel,
-                "Id",
-                "TypeAndInventNumber",
-                historyVM.EquipmentId);
-
-            ViewBag.EmployeeId = new SelectList(
-                EmployeeService.GetAll(),
-                "EmployeeId",
-                "EmployeeFullName",
-                historyVM.EmployeeId);
-
-            return View(historyVM);
+            catch (ArgumentNullException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            catch (NotFoundException)
+            {
+                return HttpNotFound();
+            }
         }
 
         [HttpPost]
@@ -247,45 +144,11 @@ namespace Inventory.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            List<EquipmentSelectModel> equipmentSelectModel = new List<EquipmentSelectModel>();
-            var eqipmentWithInventNumber = EquipmentService.GetAll();
-
-            foreach (var item in eqipmentWithInventNumber)
-            {
-                equipmentSelectModel.Add(
-                    new EquipmentSelectModel
-                    {
-                        Id = item.Id,
-                        TypeAndInventNumber = item.EquipmentType.Name + " (Номер: " + item.InventNumber + ")"
-                    }
-                );
-            }
-
             ViewBag.ChangeDateNow = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
-
-            ViewBag.StatusTypeId = new SelectList(
-                StatusTypeService.GetAll(),
-                "Id",
-                "Name",
-                historyVM.StatusTypeId);
-
-            ViewBag.RepairPlaceId = new SelectList(
-                RepairPlaceService.GetAll(),
-                "Id",
-                "Name",
-                historyVM.RepairPlaceId);
-
-            ViewBag.EquipmentId = new SelectList(
-                equipmentSelectModel,
-                "Id",
-                "TypeAndInventNumber",
-                historyVM.EquipmentId);
-
-            ViewBag.EmployeeId = new SelectList(
-                EmployeeService.GetAll(),
-                "EmployeeId",
-                "EmployeeFullName",
-                historyVM.EmployeeId);
+            ViewBag.StatusTypeId = GetStatusTypeIdSelectList(historyVM.StatusTypeId);
+            ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList(historyVM.RepairPlaceId);
+            ViewBag.EquipmentId = GetEquipmentIdSelectList(historyVM.EquipmentId);
+            ViewBag.EmployeeId = GetEmployeeIdSelectList(historyVM.EmployeeId);
 
             return View(historyVM);
         }

@@ -6,7 +6,6 @@ using Inventory.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PagedList;
 using AutoMapper;
 
 namespace Inventory.BLL.Services
@@ -22,6 +21,18 @@ namespace Inventory.BLL.Services
         public HistoryDTO Get(Guid id)
         {
             History history = _unitOfWork.History.Get(id);
+
+            return Mapper.Map<HistoryDTO>(history);
+        }
+
+        public HistoryDTO Get(Guid? id)
+        {
+            if (id == null)
+                throw new ArgumentNullException();
+
+            History history = _unitOfWork.History.Get(id);
+            if (history == null)
+                throw new NotFoundException();
 
             return Mapper.Map<HistoryDTO>(history);
         }
@@ -61,25 +72,35 @@ namespace Inventory.BLL.Services
             _unitOfWork.Save();
         }
 
-        public IEnumerable<HistoryDTO> Filter(int pageNumber, int pageSize, IEnumerable<HistoryDTO> histories, string equipmentId, string employeeId, string repairPlaceId, string statusTypeId)
+        public IEnumerable<HistoryDTO> GetFilteredList(FilterParamsDTO parameters)
         {
-            var rawData = (from e in GetAll()
-                           select e).ToList();
-            var employee = from e in rawData
-                           select e;
+            IEnumerable<HistoryDTO> filteredList = GetAll();
 
-            if (!String.IsNullOrEmpty(equipmentId))
-                histories = histories.Where(e => e.Equipment.Id.ToString() == equipmentId).ToPagedList(pageNumber, pageSize);
+            if (!string.IsNullOrEmpty(parameters.EquipmentId))
+            {
+                Guid guidEquipmentId = Guid.Parse(parameters.EquipmentId);
+                filteredList = filteredList.Where(h => h.EquipmentId == guidEquipmentId);
+            }
 
-            if (!String.IsNullOrEmpty(employeeId))
-                histories = histories.Where(e => e.Employee.EmployeeId.ToString() == employeeId).ToPagedList(pageNumber, pageSize);
+            if (!string.IsNullOrEmpty(parameters.EmployeeId))
+            {
+                int intEmployeeId = int.Parse(parameters.EmployeeId);
+                filteredList = filteredList.Where(h => h.EmployeeId == intEmployeeId);
+            }
 
-            if (!String.IsNullOrEmpty(repairPlaceId))
-                histories = histories.Where(e => e.RepairPlace.Id.ToString() == repairPlaceId).ToPagedList(pageNumber, pageSize);
-            if (!String.IsNullOrEmpty(statusTypeId))
-                histories = histories.Where(e => e.StatusType.Id.ToString() == statusTypeId).ToPagedList(pageNumber, pageSize);
+            if (!string.IsNullOrEmpty(parameters.RepairPlaceId))
+            {
+                Guid guidRepairPlaceId = Guid.Parse(parameters.RepairPlaceId);
+                filteredList = filteredList.Where(h => h.RepairPlaceId == guidRepairPlaceId);
+            }
 
-            return histories;
+            if (!string.IsNullOrEmpty(parameters.StatusTypeId))
+            {
+                Guid guidStatusTypeId = Guid.Parse(parameters.StatusTypeId);
+                filteredList = filteredList.Where(h => h.StatusTypeId == guidStatusTypeId);
+            }
+
+            return filteredList.OrderBy(h => h.Employee.EmployeeFullName);
         }
 
         public void Dispose()
