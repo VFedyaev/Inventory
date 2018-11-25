@@ -26,7 +26,7 @@ namespace Inventory.Web.Controllers
 
         [Authorize(Roles = "admin, manager, user")]
         [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
-        public ActionResult Index(int? page, string equipmentId, string employeeId, string repairPlaceId, string statusTypeId)
+        public ActionResult Index(int? page)
         {
             ViewBag.StatusTypeId = GetStatusTypeIdSelectList();
             ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList();
