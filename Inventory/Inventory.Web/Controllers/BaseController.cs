@@ -20,8 +20,6 @@ namespace Inventory.Web.Controllers
         public IStatusTypeService StatusTypeService;
         public IRepairPlaceService RepairPlaceService;
 
-        public const int PageSize = 10;
-
         public BaseController(
             IHistoryService historyService,
             IStatusTypeService statusTypeService,

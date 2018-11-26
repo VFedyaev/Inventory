@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Inventory.BLL.DTO;
-using Inventory.BLL.Infrastructure;
 using Inventory.BLL.Interfaces;
 using Inventory.DAL.Entities;
 using Inventory.DAL.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,13 +38,20 @@ namespace Inventory.BLL.Services
 
         public async Task ChangeUserRole(ChangeRoleDTO changeRoleDTO)
         {
-            await worker.UserManager.RemoveFromRoleAsync(changeRoleDTO.UserId, changeRoleDTO.OldRole);
-            await worker.UserManager.AddToRoleAsync(changeRoleDTO.UserId, changeRoleDTO.Role);
+            if (!string.IsNullOrEmpty(changeRoleDTO.OldRole))
+                await worker.UserManager.RemoveFromRoleAsync(changeRoleDTO.UserId, changeRoleDTO.OldRole);
+
+            if (!string.IsNullOrEmpty(changeRoleDTO.Role))
+                await worker.UserManager.AddToRoleAsync(changeRoleDTO.UserId, changeRoleDTO.Role);
+
             await worker.SaveAsync();
-        } 
+        }
 
         public async Task DeleteUser(string userId)
         {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentNullException();
+
             var user = await worker.UserManager.FindByIdAsync(userId);
             var userRoles = await worker.UserManager.GetRolesAsync(userId);
 
