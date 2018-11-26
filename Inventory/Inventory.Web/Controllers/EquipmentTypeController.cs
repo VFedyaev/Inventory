@@ -18,7 +18,6 @@ namespace Inventory.Web.Controllers
         public EquipmentTypeController(IEquipmentTypeService equipmentTypeService) : base(equipmentTypeService) { }
 
         [Authorize(Roles = "admin, manager")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxEquipmentTypeList(int? page)
         {
             IEnumerable<EquipmentTypeDTO> equipmentTypeDTOs = EquipmentTypeService.GetListOrderedByName().ToList();
@@ -28,7 +27,6 @@ namespace Inventory.Web.Controllers
         }
 
         [Authorize(Roles = "admin, manager")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
             IEnumerable<EquipmentTypeDTO> equipmentTypeDTOs = EquipmentTypeService.GetListOrderedByName().ToList();

@@ -22,7 +22,6 @@ namespace Inventory.Web.Controllers
         }
 
         [Authorize(Roles = "admin, manager")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxStatusTypeList(int? page)
         {
             int pageSize = 10;
@@ -37,7 +36,6 @@ namespace Inventory.Web.Controllers
 
         // GET: StatusType
         [Authorize(Roles = "admin, manager")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
             List<StatusTypeDTO> statusTypeDTOs = StatusTypeService.GetAll().ToList();

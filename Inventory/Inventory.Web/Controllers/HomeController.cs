@@ -23,7 +23,6 @@ namespace Inventory.Web.Controllers
 
         //[AllowAnonymous]
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index()
         {
            IEnumerable<DivisionEquipmentDTO> structuredEquipment = EquipmentService

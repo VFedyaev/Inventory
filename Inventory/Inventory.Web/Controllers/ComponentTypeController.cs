@@ -18,7 +18,6 @@ namespace Inventory.Web.Controllers
         public ComponentTypeController(IComponentTypeService componentTypeService) : base(componentTypeService) { }
 
         [Authorize(Roles = "admin, manager")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxComponentTypeList(int? page)
         {
             int pageNumber = (page ?? 1);
@@ -30,7 +29,6 @@ namespace Inventory.Web.Controllers
         }
 
         [Authorize(Roles = "admin, manager")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
             int pageNumber = (page ?? 1);

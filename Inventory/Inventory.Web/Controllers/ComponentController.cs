@@ -21,7 +21,6 @@ namespace Inventory.Web.Controllers
             IEquipmentService equipService) : base(compService, compTypeService, equipService) { }
 
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxComponentList(int? page)
         {
             int pageNumber = (page ?? 1);
@@ -44,7 +43,6 @@ namespace Inventory.Web.Controllers
         }
 
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
             int pageNumber = (page ?? 1);

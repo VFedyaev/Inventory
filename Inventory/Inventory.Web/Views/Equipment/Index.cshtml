@@ -38,9 +38,10 @@
     <div id="results" class="content"></div>
 
     <div class="content" id="accordion">
-        @foreach (var item in Model)
-        {
-            <div id="listTable">
+        <div id="listTable">
+            @foreach (var item in Model)
+            {
+
                 <div class="item-block equipment-block row">
                     <div class="col-md-4">
                         <p><b>@Html.DisplayFor(modelItem => item.EquipmentType.Name)</b></p>
@@ -147,9 +148,10 @@
                         <p>Нет комплектующих</p>
                     }
                 </div>
-            </div>
-            <hr />
-        }
+
+            }
+        </div>
+        <hr />
 
         <div id="result"> </div>
 
@@ -163,7 +165,6 @@
             }
         </div>
     </div>
-
 </div>
 
 <!-- Bootstrap modal popup -->

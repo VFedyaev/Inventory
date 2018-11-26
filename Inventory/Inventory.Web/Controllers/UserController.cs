@@ -26,7 +26,6 @@ namespace Inventory.Web.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
             int pageSize = 10;
