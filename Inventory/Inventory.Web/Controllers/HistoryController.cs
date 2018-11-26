@@ -28,10 +28,19 @@ namespace Inventory.Web.Controllers
         [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
-            ViewBag.StatusTypeId = GetStatusTypeIdSelectList();
-            ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList();
-            ViewBag.EquipmentId = GetEquipmentIdSelectList();
-            ViewBag.EmployeeId = GetEmployeeIdSelectList();
+            string equipmentId = Request.QueryString["EquipmentId"];
+            string employeeId = Request.QueryString["EmployeeId"];
+            string repairPlaceId = Request.QueryString["RepairPlaceId"];
+            string statusTypeId = Request.QueryString["StatusTypeId"];
+
+            ViewBag.EquipmentId = GetEquipmentIdSelectList(
+                string.IsNullOrEmpty(equipmentId) ? (Guid?)null : Guid.Parse(equipmentId));
+            ViewBag.EmployeeId = GetEmployeeIdSelectList(
+                string.IsNullOrEmpty(employeeId) ? (int?)null : int.Parse(employeeId));
+            ViewBag.RepairPlaceId = GetRepairPlaceIdSelectList(
+                string.IsNullOrEmpty(repairPlaceId) ? (Guid?)null : Guid.Parse(repairPlaceId));
+            ViewBag.StatusTypeId = GetStatusTypeIdSelectList(
+                string.IsNullOrEmpty(statusTypeId) ? (Guid?)null : Guid.Parse(statusTypeId));
 
             IEnumerable<HistoryDTO> historyDTOs = HistoryService.GetAll().ToList();
 
@@ -39,10 +48,10 @@ namespace Inventory.Web.Controllers
 
             FilterParamsDTO parameters = new FilterParamsDTO
             {
-                EquipmentId = Request.QueryString["equipmentId"],
-                EmployeeId = Request.QueryString["emploeyeId"],
-                RepairPlaceId = Request.QueryString["repairPlaceId"],
-                StatusTypeId = Request.QueryString["statusTypeId"]
+                EquipmentId = equipmentId,
+                EmployeeId = employeeId,
+                RepairPlaceId = repairPlaceId,
+                StatusTypeId = statusTypeId
             };
 
             var filteredHistoryDTOList = HistoryService.GetFilteredList(parameters).ToList();
