@@ -63,7 +63,34 @@ namespace Inventory.BLL.Services
             throw new NotImplementedException();
         }
 
-        public void UpdateEquipmentRelations(Guid equipmentId, string[] componentIds)
+        public void UpdateEquipmentRelations(Guid? equipId, string[] componentIds)
+        {
+            if (equipId == null)
+                throw new ArgumentNullException();
+            Guid equipmentId = (Guid)equipId;
+
+            if (componentIds.Length <= 0)
+            {
+                DeleteRelationsByEquipmentId(equipmentId);
+                return;
+            }
+
+            UpdateEquipmentRelations(equipmentId, componentIds);
+        }
+
+        public void DeleteRelationsByEquipmentId(Guid id)
+        {
+            IEnumerable<Guid> relationIds = _unitOfWork
+                .EquipmentComponentRelations
+                .Find(r => r.EquipmentId == id)
+                .Select(r => r.Id)
+                .ToList();
+
+            foreach (Guid relationId in relationIds)
+                Delete(relationId);
+        }
+
+        private void UpdateEquipmentRelations(Guid equipmentId, string[] componentIds)
         {
             List<Guid> equipmentComponentIds = _unitOfWork
                 .EquipmentComponentRelations
@@ -93,18 +120,6 @@ namespace Inventory.BLL.Services
 
             if (relation != null)
                 Delete(relation.Id);
-        }
-
-        public void DeleteRelationsByEquipmentId(Guid id)
-        {
-            IEnumerable<Guid> relationIds = _unitOfWork
-                .EquipmentComponentRelations
-                .Find(r => r.EquipmentId == id)
-                .Select(r => r.Id)
-                .ToList();
-
-            foreach (Guid relationId in relationIds)
-                Delete(relationId);
         }
 
         public void Delete(Guid id)

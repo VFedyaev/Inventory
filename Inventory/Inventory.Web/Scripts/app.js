@@ -200,7 +200,7 @@ function searchComponents(type) {
 
 function attachComponent(componentId) {
     if (document.body.contains(document.getElementById("pinned-" + componentId))) {
-        alert("Комплектующие уже в списке.");
+        alert("Комплектующее уже в списке.");
         return false;
     }
 
