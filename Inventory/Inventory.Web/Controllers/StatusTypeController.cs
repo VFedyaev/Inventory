@@ -15,6 +15,8 @@ namespace Inventory.Web.Controllers
 {
     public class StatusTypeController : Controller
     {
+        private const int ItemsPerPage = 10;
+
         private IStatusTypeService StatusTypeService;
         public StatusTypeController(IStatusTypeService statusTypeService)
         {
@@ -25,14 +27,10 @@ namespace Inventory.Web.Controllers
         [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxStatusTypeList(int? page)
         {
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-            IEnumerable<StatusTypeDTO> statusTypeDTOs = StatusTypeService
-                .GetAll()
-                .ToList();
+            IEnumerable<StatusTypeDTO> statusTypeDTOs = StatusTypeService.GetListOrderedByName().ToList();
             IEnumerable<StatusTypeVM> statusTypeVMs = Mapper.Map<IEnumerable<StatusTypeVM>>(statusTypeDTOs);
 
-            return PartialView(statusTypeVMs.OrderBy(s => s.Name).ToPagedList(pageNumber, pageSize));
+            return PartialView(statusTypeVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         // GET: StatusType
@@ -40,26 +38,30 @@ namespace Inventory.Web.Controllers
         [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
-            List<StatusTypeDTO> statusTypeDTOs = StatusTypeService.GetAll().ToList();
+            List<StatusTypeDTO> statusTypeDTOs = StatusTypeService.GetListOrderedByName().ToList();
             IEnumerable<StatusTypeVM> statusTypeVMs = Mapper.Map<IEnumerable<StatusTypeVM>>(statusTypeDTOs);
 
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-            return View(statusTypeVMs.OrderBy(s => s.Name).ToPagedList(pageNumber, pageSize));
+            return View(statusTypeVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]
         public ActionResult Details(Guid? id)
         {
-            if (id == null)
+            try
+            {
+                StatusTypeDTO statusTypeDTO = StatusTypeService.Get(id);
+                StatusTypeVM statusTypeVM = Mapper.Map<StatusTypeVM>(statusTypeDTO);
+
+                return View(statusTypeVM);
+            }
+            catch (ArgumentNullException)
+            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            StatusTypeDTO statusTypeDTO = StatusTypeService.Get((Guid)id);
-            if (statusTypeDTO == null)
+            }
+            catch (NotFoundException)
+            {
                 return HttpNotFound();
-
-            StatusTypeVM statusTypeVM = Mapper.Map<StatusTypeVM>(statusTypeDTO);
-
-            return View(statusTypeVM);
+            }
         }
 
         [Authorize(Roles = "admin, manager")]
@@ -86,16 +88,21 @@ namespace Inventory.Web.Controllers
         [Authorize(Roles = "admin, manager")]
         public ActionResult Edit(Guid? id)
         {
-            if (id == null)
+            try
+            {
+                StatusTypeDTO statusTypeDTO = StatusTypeService.Get(id);
+                StatusTypeVM statusTypeVM = Mapper.Map<StatusTypeVM>(statusTypeDTO);
+
+                return View(statusTypeVM);
+            }
+            catch (ArgumentNullException)
+            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
-            StatusTypeDTO statusTypeDTO = StatusTypeService.Get((Guid)id);
-            if (statusTypeDTO == null)
+            }
+            catch (NotFoundException)
+            {
                 return HttpNotFound();
-
-            StatusTypeVM statusTypeVM = Mapper.Map<StatusTypeVM>(statusTypeDTO);
-
-            return View(statusTypeVM);
+            }
         }
 
         [HttpPost]
