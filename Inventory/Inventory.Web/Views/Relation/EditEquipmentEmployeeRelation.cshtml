@@ -4,35 +4,37 @@
     ViewBag.Title = "Редактирование записи";
 }
 
-<h2>Редактирование записи</h2>
+<div class="block">
+    <h2>Редактирование записи</h2>
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.Id)
-        @Html.HiddenFor(model => model.EquipmentId)
+        <div class="form-horizontal">
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.Id)
+            @Html.HiddenFor(model => model.EquipmentId)
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreatedAt)
-            <input type="date" name="CreatedAt" id="CreatedAt" class="form-control text-box single-line" value="@Model.CreatedAt.ToString("yyyy-MM-dd")" />
-            @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
-        </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreatedAt)
+                <input type="date" name="CreatedAt" id="CreatedAt" class="form-control text-box single-line" value="@Model.CreatedAt.ToString("yyyy-MM-dd")" />
+                @Html.ValidationMessageFor(model => model.CreatedAt, "", new { @class = "text-danger" })
+            </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.UpdatedAt)
-            <input type="date" name="UpdatedAt" id="UpdatedAt" class="form-control text-box single-line" value="@Model.UpdatedAt.ToString("yyyy-MM-dd")" />
-            @Html.ValidationMessageFor(model => model.UpdatedAt, "", new { @class = "text-danger" })
-        </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.UpdatedAt)
+                <input type="date" name="UpdatedAt" id="UpdatedAt" class="form-control text-box single-line" value="@Model.UpdatedAt.ToString("yyyy-MM-dd")" />
+                @Html.ValidationMessageFor(model => model.UpdatedAt, "", new { @class = "text-danger" })
+            </div>
 
-        <div class="form-group">
-            <div class="btn-group" role="group">
-                <button type="submit" class="btn btn-success"><i class="fa fa-save" aria-hidden="true" title="Сохранить" data-toggle="tooltip" data-placement="top"><span style="padding: 5px;">Сохранить</span></i></button>
-                <a href="@Url.Action("OwnerHistory", "Equipment", new { equipmentId = Model.EquipmentId })" class="btn btn-info"><i class="fa fa-arrow-left" aria-hidden="true" title="Назад" data-toggle="tooltip" data-placement="top"><span style="padding: 5px;">Назад</span></i></a>
+            <div class="form-group">
+                <div class="btn-group" role="group">
+                    <button type="submit" class="btn btn-success"><i class="fa fa-save" aria-hidden="true" title="Сохранить" data-toggle="tooltip" data-placement="top"></i> Сохранить</button>
+                    <a href="@Url.Action("OwnerHistory", "Equipment", new { equipmentId = Model.EquipmentId })" class="btn btn-info"><i class="fa fa-arrow-left" aria-hidden="true" title="Назад" data-toggle="tooltip" data-placement="top"></i> Назад</a>
+                </div>
             </div>
         </div>
-    </div>
-}
+    }
+</div>

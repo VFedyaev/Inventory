@@ -7,8 +7,6 @@ using Inventory.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Inventory.BLL.Services
 {
@@ -27,9 +25,28 @@ namespace Inventory.BLL.Services
             return Mapper.Map<RepairPlaceDTO>(repairPlace);
         }
 
+        public RepairPlaceDTO Get(Guid? id)
+        {
+            if (id == null)
+                throw new ArgumentNullException();
+
+            RepairPlace repairPlace = _unitOfWork.RepairPlaces.Get(id);
+            if (repairPlace == null)
+                throw new NotFoundException();
+
+            return Mapper.Map<RepairPlaceDTO>(repairPlace);
+        }
+
         public IEnumerable<RepairPlaceDTO> GetAll()
         {
             List<RepairPlace> repairPlaces = _unitOfWork.RepairPlaces.GetAll().ToList();
+
+            return Mapper.Map<IEnumerable<RepairPlaceDTO>>(repairPlaces);
+        }
+
+        public IEnumerable<RepairPlaceDTO> GetListOrderedByName()
+        {
+            List<RepairPlace> repairPlaces = _unitOfWork.RepairPlaces.GetAll().OrderBy(p => p.Name).ToList();
 
             return Mapper.Map<IEnumerable<RepairPlaceDTO>>(repairPlaces);
         }

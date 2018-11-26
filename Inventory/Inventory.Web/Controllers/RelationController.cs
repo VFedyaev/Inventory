@@ -6,13 +6,14 @@ using System.Net;
 using Inventory.Web.Models;
 using Inventory.BLL.DTO;
 using AutoMapper;
+using Inventory.BLL.Infrastructure;
 
 namespace Inventory.Web.Controllers
 {
     public class RelationController : Controller
     {
-        private IEqEmpRelServ EqEmpService;
-        private IEqComRelServ EqComService;
+        IEqEmpRelServ EqEmpService;
+        IEqComRelServ EqComService;
 
         public RelationController(IEqEmpRelServ eqEmpService, IEqComRelServ eqComService)
         {
@@ -25,26 +26,18 @@ namespace Inventory.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateOwnerHistory(Guid? equipmentId)
         {
-            if (equipmentId == null)
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
-            string[] employeeIds = Request.Form.GetValues("employeeId[]") ?? new string[0];
-            if (employeeIds.Length <= 0)
-                EqEmpService.DeleteRelationsByEquipmentId((Guid)equipmentId);
-            else
+            try
             {
-                try
-                {
-                    EqEmpService.UpdateEquipmentRelations((Guid)equipmentId, employeeIds);
-                    if (Request.Form["ownerId"] != null)
-                        EqEmpService.ResetOwner((Guid)equipmentId, int.Parse(Request.Form["ownerId"]));
-                    else
-                        EqEmpService.UnsetOwner((Guid)equipmentId);
-                }
-                catch
-                {
-                    EqEmpService.DeleteRelationsByEquipmentId((Guid)equipmentId);
-                }
+                string[] employeeIds = Request.Form.GetValues("employeeId[]") ?? new string[0];
+                EqEmpService.UpdateEquipmentRelations(equipmentId, employeeIds, Request.Form["ownerId"]);
+            }
+            catch (ArgumentNullException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            catch
+            {
+                EqEmpService.DeleteRelationsByEquipmentId((Guid)equipmentId);
             }
 
             return RedirectToRoute(new
@@ -60,22 +53,18 @@ namespace Inventory.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult UpdateComponents(Guid? equipmentId)
         {
-            if (equipmentId == null)
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
             string[] componentIds = Request.Form.GetValues("componentId[]") ?? new string[0];
-            if (componentIds.Length <= 0)
-                EqComService.DeleteRelationsByEquipmentId((Guid)equipmentId);
-            else
+            try
             {
-                try
-                {
-                    EqComService.UpdateEquipmentRelations((Guid)equipmentId, componentIds);
-                }
-                catch
-                {
-                    EqComService.DeleteRelationsByEquipmentId((Guid)equipmentId);
-                }
+                EqComService.UpdateEquipmentRelations(equipmentId, componentIds);
+            }
+            catch (ArgumentNullException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            catch
+            {
+                EqComService.DeleteRelationsByEquipmentId((Guid)equipmentId);
             }
 
             return RedirectToRoute(new
@@ -89,31 +78,24 @@ namespace Inventory.Web.Controllers
         [Authorize(Roles = "admin, manager")]
         public ActionResult EditEquipmentEmployeeRelation()
         {
-            Guid equipmentId;
-            int employeeId;
+            Guid? equipmentId = Guid.Parse(Request.QueryString["equipmentId"]);
+            int? employeeId = int.Parse(Request.QueryString["employeeId"]);
+
             try
             {
-                equipmentId = Guid.Parse(Request.QueryString["equipmentId"]);
-                employeeId = int.Parse(Request.QueryString["employeeId"]);
+                EquipmentEmployeeRelationDTO relationDTO = EqEmpService.GetByEquipmentAndEmployee(equipmentId, employeeId);
+                EquipmentEmployeeRelationVM relationVM = Mapper.Map<EquipmentEmployeeRelationVM>(relationDTO);
+
+                return View(relationVM);
             }
             catch (ArgumentNullException)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-
-            EquipmentEmployeeRelationDTO relationDTO;
-            try
-            {
-                relationDTO = EqEmpService.GetByEquipmentAndEmployee(equipmentId, employeeId);
-            }
-            catch (DllNotFoundException)
+            catch (NotFoundException)
             {
                 return HttpNotFound();
             }
-
-            EquipmentEmployeeRelationVM relationVM = Mapper.Map<EquipmentEmployeeRelationVM>(relationDTO);
-
-            return View(relationVM);
         }
 
         [HttpPost]
@@ -125,6 +107,7 @@ namespace Inventory.Web.Controllers
             {
                 EquipmentEmployeeRelationDTO relationDTO = Mapper.Map<EquipmentEmployeeRelationDTO>(relationVM);
                 EqEmpService.UpdateDates(relationDTO);
+                TempData["success"] = "Изменения сохранены.";
             }
             else
                 ModelState.AddModelError(null, "Что-то пошло не так. Не удалось сохранить изменения");

@@ -25,8 +25,11 @@ namespace Inventory.BLL.Services
             return Mapper.Map<EquipmentEmployeeRelationDTO>(relation);
         }
 
-        public EquipmentEmployeeRelationDTO GetByEquipmentAndEmployee(Guid equipmentId, int employeeId)
+        public EquipmentEmployeeRelationDTO GetByEquipmentAndEmployee(Guid? equipmentId, int? employeeId)
         {
+            if (equipmentId == null || employeeId == null)
+                throw new ArgumentNullException();
+
             EquipmentEmployeeRelation relation = _unitOfWork
                 .EquipmentEmployeeRelations
                 .Find(r => r.EquipmentId == equipmentId &&
@@ -101,7 +104,34 @@ namespace Inventory.BLL.Services
             _unitOfWork.Save();
         }
 
-        public void UpdateEquipmentRelations(Guid equipmentId, string[] employeeIds)
+        public void UpdateEquipmentRelations(Guid? equipId, string[] employeeIds, string ownerId)
+        {
+            if (equipId == null)
+                throw new ArgumentNullException();
+            Guid equipmentId = (Guid)equipId;
+
+            if (employeeIds.Length <= 0)
+            {
+                DeleteRelationsByEquipmentId(equipmentId);
+                return;
+            }
+            UpdateEquipmentRelations(equipmentId, employeeIds);
+            UpdateOwner(equipmentId, ownerId);
+        }
+
+        public void DeleteRelationsByEquipmentId(Guid id)
+        {
+            IEnumerable<Guid> relationIds = _unitOfWork
+                .EquipmentEmployeeRelations
+                .Find(r => r.EquipmentId == id)
+                .Select(r => r.Id)
+                .ToList();
+
+            foreach (Guid relationId in relationIds)
+                Delete(relationId);
+        }
+
+        private void UpdateEquipmentRelations(Guid equipmentId, string[] employeeIds)
         {
             List<int> equipmentEmployeeIds = _unitOfWork
                 .EquipmentEmployeeRelations
@@ -122,6 +152,14 @@ namespace Inventory.BLL.Services
                     this.DeleteEquipmentRelation(equipmentId, equipmentEmployeeId);
         }
 
+        private void UpdateOwner(Guid equipmentId, string ownerId)
+        {
+            if (!string.IsNullOrEmpty(ownerId))
+                ResetOwner(equipmentId, int.Parse(ownerId));
+            else
+                UnsetOwner(equipmentId);
+        }
+
         private void DeleteEquipmentRelation(Guid equipmentId, int employeeId)
         {
             EquipmentEmployeeRelation relation = _unitOfWork
@@ -131,18 +169,6 @@ namespace Inventory.BLL.Services
 
             if (relation != null)
                 this.Delete(relation.Id);
-        }
-
-        public void DeleteRelationsByEquipmentId(Guid id)
-        {
-            IEnumerable<Guid> relationIds = _unitOfWork
-                .EquipmentEmployeeRelations
-                .Find(r => r.EquipmentId == id)
-                .Select(r => r.Id)
-                .ToList();
-
-            foreach (Guid relationId in relationIds)
-                Delete(relationId);
         }
 
         public void Delete(Guid id)

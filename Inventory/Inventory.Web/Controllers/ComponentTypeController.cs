@@ -15,6 +15,8 @@ namespace Inventory.Web.Controllers
 {
     public class ComponentTypeController : BaseController
     {
+        private const int ItemsPerPage = 10;
+
         public ComponentTypeController(IComponentTypeService componentTypeService) : base(componentTypeService) { }
 
         [Authorize(Roles = "admin, manager")]
@@ -25,7 +27,7 @@ namespace Inventory.Web.Controllers
             IEnumerable<ComponentTypeDTO> componentTypeDTOs = ComponentTypeService.GetListOrderedByName().ToList();
             IEnumerable<ComponentTypeVM> componentTypeVMs = Mapper.Map<IEnumerable<ComponentTypeVM>>(componentTypeDTOs);
 
-            return PartialView(componentTypeVMs.ToPagedList(pageNumber, PageSize));
+            return PartialView(componentTypeVMs.ToPagedList(pageNumber, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]
@@ -36,7 +38,7 @@ namespace Inventory.Web.Controllers
             IEnumerable<ComponentTypeDTO> componentTypeDTOs = ComponentTypeService.GetListOrderedByName().ToList();
             IEnumerable<ComponentTypeVM> componentTypeVMs = Mapper.Map<IEnumerable<ComponentTypeVM>>(componentTypeDTOs);
 
-            return View(componentTypeVMs.ToPagedList(pageNumber, PageSize));
+            return View(componentTypeVMs.ToPagedList(pageNumber, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]

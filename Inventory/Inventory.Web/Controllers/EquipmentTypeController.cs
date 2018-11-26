@@ -15,6 +15,8 @@ namespace Inventory.Web.Controllers
 {
     public class EquipmentTypeController : BaseController
     {
+        private const int ItemsPerPage = 10;
+
         public EquipmentTypeController(IEquipmentTypeService equipmentTypeService) : base(equipmentTypeService) { }
 
         [Authorize(Roles = "admin, manager")]
@@ -23,7 +25,7 @@ namespace Inventory.Web.Controllers
             IEnumerable<EquipmentTypeDTO> equipmentTypeDTOs = EquipmentTypeService.GetListOrderedByName().ToList();
             IEnumerable<EquipmentTypeVM> equipmentTypeVMs = Mapper.Map<IEnumerable<EquipmentTypeVM>>(equipmentTypeDTOs);
 
-            return PartialView(equipmentTypeVMs.ToPagedList(page ?? 1, PageSize));
+            return PartialView(equipmentTypeVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]
@@ -32,7 +34,7 @@ namespace Inventory.Web.Controllers
             IEnumerable<EquipmentTypeDTO> equipmentTypeDTOs = EquipmentTypeService.GetListOrderedByName().ToList();
             IEnumerable<EquipmentTypeVM> equipmentTypeVMs = Mapper.Map<IEnumerable<EquipmentTypeVM>>(equipmentTypeDTOs);
 
-            return View(equipmentTypeVMs.ToPagedList(page ?? 1, PageSize));
+            return View(equipmentTypeVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]

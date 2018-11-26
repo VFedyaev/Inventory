@@ -15,6 +15,7 @@ namespace Inventory.Web.Controllers
 {
     public class RepairPlaceController : Controller
     {
+        private const int ItemsPerPage = 10;
         private IRepairPlaceService RepairPlaceService;
         public RepairPlaceController(IRepairPlaceService repairPlaceService)
         {
@@ -24,40 +25,41 @@ namespace Inventory.Web.Controllers
         [Authorize(Roles = "admin, manager")]
         public ActionResult AjaxRepairPlaceList(int? page)
         {
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-
             IEnumerable<RepairPlaceDTO> repairPlaceDTOs = RepairPlaceService
-             .GetAll()
+             .GetListOrderedByName()
              .ToList();
             IEnumerable<RepairPlaceVM> repairPlaceVMs = Mapper.Map<IEnumerable<RepairPlaceVM>>(repairPlaceDTOs);
-            return PartialView(repairPlaceVMs.OrderBy(n => n.Name).ToPagedList(pageNumber,pageSize));
+
+            return PartialView(repairPlaceVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
-        // GET: StatusType
         [Authorize(Roles = "admin, manager")]
         public ActionResult Index(int? page)
         {
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-
-            IEnumerable<RepairPlaceDTO> repairPlaceDTOs = RepairPlaceService.GetAll().ToList();
+            IEnumerable<RepairPlaceDTO> repairPlaceDTOs = RepairPlaceService.GetListOrderedByName().ToList();
             IEnumerable<RepairPlaceVM> repairPlaceVMs = Mapper.Map<IEnumerable<RepairPlaceVM>>(repairPlaceDTOs);
 
-            return View(repairPlaceVMs.OrderBy(n => n.Name).ToPagedList(pageNumber, pageSize));
+            return View(repairPlaceVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]
         public ActionResult Details(Guid? id)
         {
-            if (id == null)
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            RepairPlaceDTO repairPlaceDTO = RepairPlaceService.Get((Guid)id);
-            if (repairPlaceDTO == null)
-                return HttpNotFound();
+            try
+            {
+                RepairPlaceDTO repairPlaceDTO = RepairPlaceService.Get(id);
+                RepairPlaceVM repairPlaceVM = Mapper.Map<RepairPlaceVM>(repairPlaceDTO);
 
-            RepairPlaceVM repairPlaceVM = Mapper.Map<RepairPlaceVM>(repairPlaceDTO);
-            return View(repairPlaceVM);
+                return View(repairPlaceVM);
+            }
+            catch (ArgumentException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            catch (NotFoundException)
+            {
+                return HttpNotFound();
+            }
         }
 
         [Authorize(Roles = "admin")]
@@ -83,15 +85,21 @@ namespace Inventory.Web.Controllers
         [Authorize(Roles = "admin, manager")]
         public ActionResult Edit(Guid? id)
         {
-            if (id == null)
+            try
+            {
+                RepairPlaceDTO repairPlaceDTO = RepairPlaceService.Get(id);
+                RepairPlaceVM repairPlaceVM = Mapper.Map<RepairPlaceVM>(repairPlaceDTO);
+
+                return View(repairPlaceVM);
+            }
+            catch (ArgumentNullException)
+            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
-            RepairPlaceDTO repairPlaceDTO = RepairPlaceService.Get((Guid)id);
-            if (repairPlaceDTO == null)
+            }
+            catch (NotFoundException)
+            {
                 return HttpNotFound();
-
-            RepairPlaceVM repairPlaceVM = Mapper.Map<RepairPlaceVM>(repairPlaceDTO);
-            return View(repairPlaceVM);
+            }
         }
 
         [HttpPost]
@@ -107,7 +115,7 @@ namespace Inventory.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View();
+            return View(repairPlaceVM);
         }
 
         [HttpPost]

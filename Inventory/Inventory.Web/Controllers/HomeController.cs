@@ -1,4 +1,5 @@
-﻿using Inventory.BLL.DTO;
+﻿using AutoMapper;
+using Inventory.BLL.DTO;
 using Inventory.BLL.Infrastructure;
 using Inventory.BLL.Interfaces;
 using Inventory.Web.Models;
@@ -28,6 +29,7 @@ namespace Inventory.Web.Controllers
            IEnumerable<DivisionEquipmentDTO> structuredEquipment = EquipmentService
                 .GetEquipmentByStructure()
                 .ToList();
+            var structuredEquipmentVMList = Mapper.Map<IEnumerable<DivisionEquipmentVM>>(structuredEquipment).ToList();
 
             return View(structuredEquipment);
         }
