@@ -99,7 +99,7 @@ namespace Inventory.Web.Controllers
 
         public SelectList GetComponentNameSelectList(string selectedValue = null)
         {
-            return new SelectList(ComponentService.GetAll().ToList(), "Name", "Name");
+            return new SelectList(ComponentService.GetAll().ToList(), "Name", "Name", selectedValue);
         }
 
         public SelectList GetStatusTypeIdSelectList(Guid? selectedValue = null)
