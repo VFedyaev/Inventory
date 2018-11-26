@@ -25,6 +25,8 @@ namespace Inventory.Web.Util
 
             Bind<IAccountService>().To<AccountService>();
             Bind<IUserService>().To<UserService>();
+
+            Bind<ISearchService>().To<SearchService>();
         }
     }
 }

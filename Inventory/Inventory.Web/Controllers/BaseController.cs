@@ -21,6 +21,24 @@ namespace Inventory.Web.Controllers
         public IRepairPlaceService RepairPlaceService;
 
         public BaseController(
+            IComponentService componentService,
+            IComponentTypeService componentTypeService,
+            IEquipmentService equipmentService,
+            IEquipmentTypeService equipmentTypeService,
+            IStatusTypeService statusTypeService,
+            IRepairPlaceService repairPlaceService,
+            IHistoryService historyService)
+        {
+            ComponentService = componentService;
+            ComponentTypeService = componentTypeService;
+            EquipmentService = equipmentService;
+            EquipmentTypeService = equipmentTypeService;
+            StatusTypeService = statusTypeService;
+            RepairPlaceService = repairPlaceService;
+            HistoryService = historyService;
+        }
+
+        public BaseController(
             IHistoryService historyService,
             IStatusTypeService statusTypeService,
             IRepairPlaceService repairPlaceService,

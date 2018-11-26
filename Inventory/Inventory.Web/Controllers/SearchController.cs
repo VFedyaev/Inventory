@@ -8,26 +8,23 @@ using AutoMapper;
 
 namespace Inventory.Web.Controllers
 {
-    public class SearchController : Controller
+    public class SearchController : BaseController
     {
-        private IComponentTypeService ComponentTypeService;
-        private IComponentService ComponentService;
-        private IEquipmentTypeService EquipmentTypeService;
-        private IEquipmentService EquipmentService;
-        private IStatusTypeService StatusTypeService;
-        private IRepairPlaceService RepairPlaceService;
-        private IHistoryService HistoryService;
-
-        public SearchController(IComponentTypeService componentTypeService, IComponentService componentService, IEquipmentTypeService equipmentTypeService, IEquipmentService equipmentService, IStatusTypeService statusTypeService, IRepairPlaceService repairPlaceService, IHistoryService historyService)
-        {
-            ComponentTypeService = componentTypeService;
-            ComponentService = componentService;
-            EquipmentTypeService = equipmentTypeService;
-            EquipmentService = equipmentService;
-            StatusTypeService = statusTypeService;
-            RepairPlaceService = repairPlaceService;
-            HistoryService = historyService;
-        }
+        public SearchController(
+            IComponentService componentService,
+            IComponentTypeService componentTypeService,
+            IEquipmentService equipmentService,
+            IEquipmentTypeService equipmentTypeService,
+            IStatusTypeService statusTypeService,
+            IRepairPlaceService repairPlaceService,
+            IHistoryService historyService) : base(
+                componentService,
+                componentTypeService,
+                equipmentService,
+                equipmentTypeService,
+                statusTypeService,
+                repairPlaceService,
+                historyService) { }
 
         [Authorize(Roles = "admin, manager, user")]
         public ActionResult AdminSearch(string title, string type)
