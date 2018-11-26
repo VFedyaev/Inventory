@@ -14,7 +14,7 @@
     </thead>
 
     <tbody>
-        @foreach (var item in ViewBag.Items)
+        @foreach (var item in Model)
         {
         <tr id="@item.Id">
             <td>@item.ComponentType.Name</td>

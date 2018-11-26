@@ -8,149 +8,50 @@ using AutoMapper;
 
 namespace Inventory.Web.Controllers
 {
-    public class SearchController : BaseController
+    public class SearchController : Controller
     {
-        public SearchController(
-            IComponentService componentService,
-            IComponentTypeService componentTypeService,
-            IEquipmentService equipmentService,
-            IEquipmentTypeService equipmentTypeService,
-            IStatusTypeService statusTypeService,
-            IRepairPlaceService repairPlaceService,
-            IHistoryService historyService) : base(
-                componentService,
-                componentTypeService,
-                equipmentService,
-                equipmentTypeService,
-                statusTypeService,
-                repairPlaceService,
-                historyService) { }
+        ISearchService SearchService;
+        public SearchController(ISearchService searchService)
+        {
+            SearchService = searchService;
+        }
 
         [Authorize(Roles = "admin, manager, user")]
         public ActionResult AdminSearch(string title, string type)
         {
-            string view = "~/Views/Search/";
-            string[] words = title.ToLower().Split(' ');
+            ModelAndViewDTO result = SearchService.GetFilteredModelAndView(title, type);
 
-            // returns not found if input string is empty
-            if (title.Trim().Length <= 0)
-                return RedirectToAction("NotFoundResult");
-
-            if (type == "equipmentType")
+            if (result.Model.Count() > 0)
             {
-                List<EquipmentTypeVM> equipmentTypeVMs = BuildEquipmentTypeSearchQuery(words).ToList();
-                BindSearchResults(equipmentTypeVMs, ref view, "EquipmentTypes.cshtml");
-            }
-            else if (type == "equipment")
-            {
-                List<EquipmentVM> equipmentVMs = BuildEquipmentSearchQuery(words).ToList();
-                BindSearchResults(equipmentVMs, ref view, "Equipments.cshtml");
-            }
-            else if (type == "componentType")
-            {
-                List<ComponentTypeVM> componentTypeVMs = BuildComponentTypeSearchQuery(words).ToList();
-                BindSearchResults(componentTypeVMs, ref view, "ComponentTypes.cshtml");
-            }
-            else if (type == "component")
-            {
-                List<ComponentVM> componentVMs = BuildComponentSearchQuery(words).ToList();
-                BindSearchResults(componentVMs, ref view, "Components.cshtml");
-            }
-            else if (type == "statusType")
-            {
-                List<StatusTypeVM> statusTypeVMs = BuildStatusTypeSearchQuery(words).ToList();
-                BindSearchResults(statusTypeVMs, ref view, "StatusTypes.cshtml");
-            }
-            else if (type == "repairPlace")
-            {
-                List<RepairPlaceVM> repairPlaceVMs = BuildRepairPlaceSearchQuery(words).ToList();
-                BindSearchResults(repairPlaceVMs, ref view, "RepairPlaces.cshtml");
-            }
-            return PartialView(view);
-        }
-
-        private IEnumerable<EquipmentTypeVM> BuildEquipmentTypeSearchQuery(params string[] words)
-        {
-            IEnumerable<EquipmentTypeDTO> equipmentTypeDTOs = EquipmentTypeService
-                .GetAll()
-                .ToList()
-                .Where(d => words.All(d.Name.ToLower().Contains));
-
-            IEnumerable<EquipmentTypeVM> equipmentTypeVMs = Mapper.Map<IEnumerable<EquipmentTypeVM>>(equipmentTypeDTOs);
-
-            return equipmentTypeVMs;
-        }
-
-        private IEnumerable<EquipmentVM> BuildEquipmentSearchQuery(params string[] words)
-        {
-            IEnumerable<EquipmentDTO> equipmentDTOs = EquipmentService.GetAll()
-                .ToList()
-                .Where(d => words.All(d.InventNumber.ToLower().Contains));
-
-            IEnumerable<EquipmentVM> equipmentVMs = Mapper.Map<IEnumerable<EquipmentVM>>(equipmentDTOs);
-
-            return equipmentVMs;
-        }
-
-        private IEnumerable<ComponentTypeVM> BuildComponentTypeSearchQuery(params string[] words)
-        {
-            IEnumerable<ComponentTypeDTO> componentTypeDTOs = ComponentTypeService.GetAll()
-                .ToList()
-                .Where(d => words.All(d.Name.ToLower().Contains));
-
-            IEnumerable<ComponentTypeVM> componentTypeVMs = Mapper.Map<IEnumerable<ComponentTypeVM>>(componentTypeDTOs);
-
-            return componentTypeVMs;
-        }
-
-        private IEnumerable<ComponentVM> BuildComponentSearchQuery(params string[] words)
-        {
-            IEnumerable<ComponentDTO> componentDTOs = ComponentService.GetAll()
-                .ToList()
-                .Where(d => d.InventNumber != null && words.All(d.InventNumber.ToLower().Contains));
-
-            IEnumerable<ComponentVM> componentVMs = Mapper.Map<IEnumerable<ComponentVM>>(componentDTOs);
-
-            return componentVMs;
-        }
-
-        private IEnumerable<StatusTypeVM> BuildStatusTypeSearchQuery(params string[] words)
-        {
-            IEnumerable<StatusTypeDTO> statusTypeDTOs = StatusTypeService.GetAll()
-                .ToList()
-                .Where(d => words.All(d.Name.ToLower().Contains));
-
-            IEnumerable<StatusTypeVM> statusTypeVMs = Mapper.Map<IEnumerable<StatusTypeVM>>(statusTypeDTOs);
-
-            return statusTypeVMs;
-        }
-
-        private IEnumerable<RepairPlaceVM> BuildRepairPlaceSearchQuery(params string[] words)
-        {
-            IEnumerable<RepairPlaceDTO> repairPlaceDTOs = RepairPlaceService.GetAll()
-                .ToList()
-                .Where(d => words.All(d.Name.ToLower().Contains));
-
-            IEnumerable<RepairPlaceVM> repairPlaceVMs = Mapper.Map<IEnumerable<RepairPlaceVM>>(repairPlaceDTOs);
-
-            return repairPlaceVMs;
-        }
-
-        // Binds entity search results and entity view
-        private void BindSearchResults<T>(List<T> items, ref string view, string entityView)
-        {
-            if (items.Count <= 0)
-            {
-                view += "NotFound.cshtml";
+                string modelType = result.Model.First().GetType().ToString().Split('.').Last();
+                switch (modelType)
+                {
+                    case "EquipmentDTO":
+                        result.Model = Mapper.Map<IEnumerable<EquipmentVM>>(result.Model);
+                        break;
+                    case "EquipmentTypeDTO":
+                        result.Model = Mapper.Map<IEnumerable<EquipmentTypeVM>>(result.Model);
+                        break;
+                    case "ComponentDTO":
+                        result.Model = Mapper.Map<IEnumerable<ComponentVM>>(result.Model);
+                        break;
+                    case "ComponentTypeDTO":
+                        result.Model = Mapper.Map<IEnumerable<ComponentTypeVM>>(result.Model);
+                        break;
+                    case "StatusTypeDTO":
+                        result.Model = Mapper.Map<IEnumerable<StatusTypeVM>>(result.Model);
+                        break;
+                    case "RepairPlaceDTO":
+                        result.Model = Mapper.Map<IEnumerable<RepairPlaceVM>>(result.Model);
+                        break;
+                }
             }
             else
-            {
-                ViewBag.Items = items;
-                view += entityView;
-            }
+                result.View = "NotFound";
+
+            return PartialView(result.View, result.Model);
         }
 
-        // Forms not found partial view
         public ActionResult NotFoundResult()
         {
             return PartialView("~/Views/Error/NotFoundError.cshtml");
