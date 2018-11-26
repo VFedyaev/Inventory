@@ -55,7 +55,7 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetEquipmentFilteredListAndView(string[] words)
         {
-            var equipmentList = _unitOfWork.Equipments.GetAll().Where(e => words.Contains(e.InventNumber.ToLower())).ToList();
+            var equipmentList = _unitOfWork.Equipments.GetAll().Where(e => words.All(e.InventNumber.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {
@@ -66,7 +66,7 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetEquipmentTypeFilteredListAndView(string[] words)
         {
-            var equipmentTypeList = _unitOfWork.EquipmentTypes.GetAll().Where(t => words.Contains(t.Name.ToLower())).ToList();
+            var equipmentTypeList = _unitOfWork.EquipmentTypes.GetAll().Where(t => words.All(t.Name.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {
@@ -77,7 +77,7 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetComponentFilteredListAndView(string[] words)
         {
-            var componentList = _unitOfWork.Components.GetAll().Where(c => c.InventNumber != null && words.Contains(c.InventNumber.ToLower())).ToList();
+            var componentList = _unitOfWork.Components.GetAll().Where(c => c.InventNumber != null && words.All(c.InventNumber.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {
@@ -88,7 +88,7 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetComponentTypeFilteredListAndVew(string[] words)
         {
-            var componentTypeList = _unitOfWork.ComponentTypes.GetAll().Where(t => words.Contains(t.Name.ToLower())).ToList();
+            var componentTypeList = _unitOfWork.ComponentTypes.GetAll().Where(t => words.All(t.Name.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {
@@ -99,7 +99,7 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetStatusTypeFilteredListAndView(string[] words)
         {
-            var statusTypeList = _unitOfWork.StatusTypes.GetAll().Where(st => words.Contains(st.Name.ToLower())).ToList();
+            var statusTypeList = _unitOfWork.StatusTypes.GetAll().Where(st => words.All(st.Name.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {
@@ -110,7 +110,7 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetRepairPlaceFilteredListAndView(string[] words)
         {
-            var repairPlaceList = _unitOfWork.RepairPlaces.GetAll().Where(rp => words.Contains(rp.Name.ToLower())).ToList();
+            var repairPlaceList = _unitOfWork.RepairPlaces.GetAll().Where(rp => words.All(rp.Name.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {
