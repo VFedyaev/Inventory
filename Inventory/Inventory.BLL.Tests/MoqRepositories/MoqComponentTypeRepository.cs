@@ -10,12 +10,12 @@ namespace Inventory.BLL.Tests.MoqRepositories
     public class MoqComponentTypeRepository
     {
         public Mock<IRepository<ComponentType>> repository;
-        public List<ComponentType> ComponentTypes { get; }
+        public List<ComponentType> Types { get; }
 
         public MoqComponentTypeRepository()
         {
             repository = new Mock<IRepository<ComponentType>>();
-            ComponentTypes = new List<ComponentType>
+            Types = new List<ComponentType>
             {
                 new ComponentType
                 {
@@ -61,23 +61,22 @@ namespace Inventory.BLL.Tests.MoqRepositories
 
         public void Create(ComponentType item)
         {
-            item.Id = Guid.NewGuid();
-            ComponentTypes.Add(item);
+            Types.Add(item);
         }
 
         public ComponentType Get(Guid? id)
         {
-            return ComponentTypes.Where(t => t.Id == id).FirstOrDefault();
+            return Types.Where(t => t.Id == id).FirstOrDefault();
         }
 
         public IEnumerable<ComponentType> GetAll()
         {
-            return ComponentTypes;
+            return Types;
         }
 
         public IEnumerable<ComponentType> Find(Func<ComponentType, bool> predicate)
         {
-            return ComponentTypes.Where(predicate);
+            return Types.Where(predicate);
         }
 
         public void Update(ComponentType item)
@@ -92,7 +91,7 @@ namespace Inventory.BLL.Tests.MoqRepositories
         {
             var item = Get(id);
             if (item != null)
-                ComponentTypes.Remove(item);
+                Types.Remove(item);
         }
     }
 }

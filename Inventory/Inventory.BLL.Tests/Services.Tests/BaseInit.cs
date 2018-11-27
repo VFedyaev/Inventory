@@ -11,46 +11,39 @@ namespace Inventory.BLL.Tests.Services.Tests
     {
         public MoqComponentTypeRepository moqComponentTypeRepository;
         public MoqComponentRepository moqComponentRepository;
+        public MoqEquipmentTypeRepository moqEquipmentTypeRepository;
+        public MoqEquipmentRepository moqEquipmentRepository;
         public Mock<IUnitOfWork> moqUnitOfWork;
 
         public ComponentTypeService ComponentTypeService;
         public ComponentService ComponentService;
 
-        public void Init()
+        public void ComponentAndComponentTypeInit()
         {
             ResetAndInitializeMapper();
-            SetupMoqRepositories();
-            SetupMoqUnitOfWork();
+
+            moqComponentTypeRepository = new MoqComponentTypeRepository();
+            moqComponentRepository = new MoqComponentRepository(moqComponentTypeRepository.Types);
+
+            moqEquipmentTypeRepository = new MoqEquipmentTypeRepository();
+            moqEquipmentRepository = new MoqEquipmentRepository(moqEquipmentTypeRepository.Types);
+
+            moqUnitOfWork = new Mock<IUnitOfWork>();
+            moqUnitOfWork
+                .Setup(u => u.ComponentTypes)
+                .Returns(moqComponentTypeRepository.repository.Object);
+            moqUnitOfWork
+                .Setup(u => u.Components)
+                .Returns(moqComponentRepository.repository.Object);
+
+            ComponentTypeService = new ComponentTypeService(moqUnitOfWork.Object);
+            ComponentService = new ComponentService(moqUnitOfWork.Object);
         }
 
         public void ResetAndInitializeMapper()
         {
             Mapper.Reset();
             Mapper.Initialize(cfg => cfg.AddProfile<AutoMapperProfile>());
-        }
-
-        private void SetupMoqRepositories()
-        {
-            moqComponentTypeRepository = new MoqComponentTypeRepository();
-            moqComponentRepository = new MoqComponentRepository(moqComponentTypeRepository.ComponentTypes);
-        }
-
-        private void SetupMoqUnitOfWork()
-        {
-            moqUnitOfWork = new Mock<IUnitOfWork>();
-
-            moqUnitOfWork
-                .Setup(u => u.Components)
-                .Returns(moqComponentRepository.repository.Object);
-            moqUnitOfWork
-                .Setup(u => u.ComponentTypes)
-                .Returns(moqComponentTypeRepository.repository.Object);
-        }
-
-        private void SetupServices()
-        {
-            ComponentTypeService = new ComponentTypeService(moqUnitOfWork.Object);
-            ComponentService = new ComponentService(moqUnitOfWork.Object);
         }
     }
 }

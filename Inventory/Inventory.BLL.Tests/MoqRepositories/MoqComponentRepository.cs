@@ -25,7 +25,7 @@ namespace Inventory.BLL.Tests.MoqRepositories
                     Name = "Genuis",
                     Description = "None",
                     Price = 1,
-                    InventNumber = "0001",
+                    InventNumber = "C0001",
                     Supplier = "Io"
                 },
                 new Component
@@ -36,7 +36,7 @@ namespace Inventory.BLL.Tests.MoqRepositories
                     Name = "Acer",
                     Description = "Acer mouse",
                     Price = 1.2m,
-                    InventNumber = "0002",
+                    InventNumber = "C0002",
                     Supplier = "AcerTech"
                 },
                 new Component
@@ -47,7 +47,7 @@ namespace Inventory.BLL.Tests.MoqRepositories
                     Name = "Acer",
                     Description = "Acer keyboard",
                     Price = 1.1m,
-                    InventNumber = "0003",
+                    InventNumber = "C0003",
                     Supplier = "AcerTech"
                 },
                 new Component
@@ -58,7 +58,7 @@ namespace Inventory.BLL.Tests.MoqRepositories
                     Name = "Genius",
                     Description = "Genius keyboard",
                     Price = 1.1m,
-                    InventNumber = "0004",
+                    InventNumber = "C0004",
                     Supplier = "Io"
                 },
                 new Component
@@ -69,7 +69,7 @@ namespace Inventory.BLL.Tests.MoqRepositories
                     Name = "Acer",
                     Description = "Acer monitor",
                     Price = 2.1m,
-                    InventNumber = "0005",
+                    InventNumber = "C0005",
                     Supplier = "AcerTech"
                 }
             };
@@ -96,7 +96,6 @@ namespace Inventory.BLL.Tests.MoqRepositories
 
         public void Create(Component item)
         {
-            item.Id = Guid.NewGuid();
             Components.Add(item);
         }
 

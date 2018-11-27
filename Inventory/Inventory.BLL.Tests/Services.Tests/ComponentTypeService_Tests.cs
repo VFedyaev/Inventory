@@ -4,10 +4,7 @@ using System.Linq;
 using Inventory.BLL.DTO;
 using Inventory.BLL.Infrastructure;
 using Inventory.BLL.Services;
-using Inventory.BLL.Tests.MoqRepositories;
-using Inventory.DAL.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 namespace Inventory.BLL.Tests.Services.Tests
 {
@@ -17,33 +14,24 @@ namespace Inventory.BLL.Tests.Services.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            ResetAndInitializeMapper();
-            moqComponentTypeRepository = new MoqComponentTypeRepository();
-            moqComponentRepository = new MoqComponentRepository(moqComponentTypeRepository.ComponentTypes);
-
-            moqUnitOfWork = new Mock<IUnitOfWork>();
-            moqUnitOfWork
-                .Setup(u => u.ComponentTypes)
-                .Returns(moqComponentTypeRepository.repository.Object);
-            moqUnitOfWork
-                .Setup(u => u.Components)
-                .Returns(moqComponentRepository.repository.Object);
-            ComponentTypeService = new ComponentTypeService(moqUnitOfWork.Object);
+            base.ComponentAndComponentTypeInit();
         }
 
         [TestMethod]
-        public void GetMethodReturnsComponentTypeDTOObject()
+        public void GetMethodReturnsComponentTypeDTOItem()
         {
             // arrange
-            var expectedItem = moqComponentTypeRepository.ComponentTypes.First();
+            var entityItemType = moqComponentTypeRepository.Types.First().GetType();
+            var expectedItemId = moqComponentTypeRepository.Types.First().Id;
+            var expectedItemName = moqComponentTypeRepository.Types.First().Name;
 
             // act
-            var returnedItem = ComponentTypeService.Get(expectedItem.Id) as ComponentTypeDTO;
+            var returnedItem = ComponentTypeService.Get(expectedItemId) as ComponentTypeDTO;
 
             // assert
-            Assert.AreNotEqual(expectedItem.GetType(), returnedItem.GetType());
-            Assert.AreEqual(expectedItem.Id, returnedItem.Id);
-            Assert.AreEqual(expectedItem.Name, returnedItem.Name);
+            Assert.AreNotEqual(entityItemType, returnedItem.GetType());
+            Assert.AreEqual(expectedItemId, returnedItem.Id);
+            Assert.AreEqual(expectedItemName, returnedItem.Name);
         }
 
         [TestMethod]
@@ -66,7 +54,7 @@ namespace Inventory.BLL.Tests.Services.Tests
         public void GetAllMethodReturnsAllItemsList()
         {
             // arrange
-            int expectedItemsCount = moqComponentTypeRepository.ComponentTypes.Count();
+            int expectedItemsCount = moqComponentTypeRepository.Types.Count();
 
             // act
             var items = ComponentTypeService.GetAll() as IEnumerable<ComponentTypeDTO>;
@@ -79,9 +67,9 @@ namespace Inventory.BLL.Tests.Services.Tests
         public void GetListOrderedByNameReturnsOrderedAllItemsList()
         {
             // arrange
-            int expectedItemsCount = moqComponentTypeRepository.ComponentTypes.Count();
-            Guid expectedFirstItemId = moqComponentTypeRepository.ComponentTypes.OrderBy(t => t.Name).First().Id;
-            Guid expectedLastItemId = moqComponentTypeRepository.ComponentTypes.OrderBy(t => t.Name).Last().Id;
+            int expectedItemsCount = moqComponentTypeRepository.Types.Count();
+            Guid expectedFirstItemId = moqComponentTypeRepository.Types.OrderBy(t => t.Name).First().Id;
+            Guid expectedLastItemId = moqComponentTypeRepository.Types.OrderBy(t => t.Name).Last().Id;
 
             // act
             var items = ComponentTypeService.GetListOrderedByName() as IEnumerable<ComponentTypeDTO>;
@@ -96,7 +84,7 @@ namespace Inventory.BLL.Tests.Services.Tests
         public void AddMethodCreatesNewItem()
         {
             // arrange
-            int expectedItemsCount = moqComponentTypeRepository.ComponentTypes.Count() + 1;
+            int expectedItemsCount = moqComponentTypeRepository.Types.Count() + 1;
             var itemToAdd = new ComponentTypeDTO
             {
                 Name = $"New-{DateTime.Now}"
@@ -106,17 +94,17 @@ namespace Inventory.BLL.Tests.Services.Tests
             ComponentTypeService.Add(itemToAdd);
 
             // assert
-            Assert.AreEqual(expectedItemsCount, moqComponentTypeRepository.ComponentTypes.Count());
-            Assert.IsTrue(moqComponentTypeRepository.ComponentTypes.Any(t => t.Name == itemToAdd.Name));
-            Assert.IsNotNull(moqComponentTypeRepository.ComponentTypes.Where(t => t.Name == itemToAdd.Name).First().Id);
+            Assert.AreEqual(expectedItemsCount, moqComponentTypeRepository.Types.Count());
+            Assert.IsTrue(moqComponentTypeRepository.Types.Any(t => t.Name == itemToAdd.Name));
+            Assert.IsNotNull(moqComponentTypeRepository.Types.Where(t => t.Name == itemToAdd.Name).First().Id);
         }
 
         [TestMethod]
         public void UpdateMethodUpdatesItemFields()
         {
             // arrange
-            var expectedItemId = moqComponentTypeRepository.ComponentTypes.First().Id;
-            var nameToChange = moqComponentTypeRepository.ComponentTypes.First().Name;
+            var expectedItemId = moqComponentTypeRepository.Types.First().Id;
+            var nameToChange = moqComponentTypeRepository.Types.First().Name;
             var item = new ComponentTypeDTO
             {
                 Id = expectedItemId,
@@ -125,7 +113,7 @@ namespace Inventory.BLL.Tests.Services.Tests
 
             // act
             ComponentTypeService.Update(item);
-            var itemAfterUpdate = moqComponentTypeRepository.ComponentTypes.First();
+            var itemAfterUpdate = moqComponentTypeRepository.Types.First();
 
             // assert
             Assert.AreEqual(expectedItemId, itemAfterUpdate.Id);
@@ -137,15 +125,15 @@ namespace Inventory.BLL.Tests.Services.Tests
         public void DeleteMethodRemovesItemIfItHasNotRelations()
         {
             // arrange
-            int expectedItemsCount = moqComponentTypeRepository.ComponentTypes.Count() - 1;
-            var removedItemId = moqComponentTypeRepository.ComponentTypes.Last().Id;
+            int expectedItemsCount = moqComponentTypeRepository.Types.Count() - 1;
+            var removedItemId = moqComponentTypeRepository.Types.Last().Id;
 
             // act
             ComponentTypeService.Delete(removedItemId);
 
             // assert
-            Assert.AreEqual(expectedItemsCount, moqComponentTypeRepository.ComponentTypes.Count());
-            Assert.IsTrue(!moqComponentTypeRepository.ComponentTypes.Any(t => t.Id == removedItemId));
+            Assert.AreEqual(expectedItemsCount, moqComponentTypeRepository.Types.Count());
+            Assert.IsTrue(!moqComponentTypeRepository.Types.Any(t => t.Id == removedItemId));
         }
 
         [TestMethod]
@@ -153,7 +141,7 @@ namespace Inventory.BLL.Tests.Services.Tests
         public void DeleteMethodThrowsExceptionIfItemHasRelations()
         {
             // act // assert
-            ComponentTypeService.Delete(moqComponentTypeRepository.ComponentTypes.First().Id);
+            ComponentTypeService.Delete(moqComponentTypeRepository.Types.First().Id);
         }
     }
 }
