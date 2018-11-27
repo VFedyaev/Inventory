@@ -62,7 +62,7 @@ namespace Inventory.Web.Controllers
             }
         }
 
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin, manager")]
         public ActionResult Create()
         {
             return View();
