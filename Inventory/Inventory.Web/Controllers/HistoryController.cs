@@ -163,7 +163,6 @@ namespace Inventory.Web.Controllers
 
         [HttpPost]
         [Authorize(Roles = "admin")]
-        [ValidateAntiForgeryToken]
         public ActionResult Delete(Guid id)
         {
             try
