@@ -99,6 +99,7 @@
     <Compile Include="DTO\EquipmentTypeDTO.cs" />
     <Compile Include="DTO\FilterParamsDTO.cs" />
     <Compile Include="DTO\HistoryDTO.cs" />
+    <Compile Include="DTO\ModelAndViewDTO.cs" />
     <Compile Include="DTO\OwnerInfoDTO.cs" />
     <Compile Include="DTO\PositionDTO.cs" />
     <Compile Include="DTO\RepairPlaceDTO.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Interfaces\IHistoryService.cs" />
     <Compile Include="Interfaces\IPartialService.cs" />
     <Compile Include="Interfaces\IRepairPlaceService.cs" />
+    <Compile Include="Interfaces\ISearchService.cs" />
     <Compile Include="Interfaces\IService.cs" />
     <Compile Include="Interfaces\IStatusTypeService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="Services\EquipmentTypeService.cs" />
     <Compile Include="Services\HistoryService.cs" />
     <Compile Include="Services\RepairPlaceService.cs" />
+    <Compile Include="Services\SearchService.cs" />
     <Compile Include="Services\StatusTypeService.cs" />
     <Compile Include="Services\UserService.cs" />
   </ItemGroup>

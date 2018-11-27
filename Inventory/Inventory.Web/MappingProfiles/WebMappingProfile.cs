@@ -19,6 +19,11 @@ namespace Inventory.Web.MappingProfiles
             CreateMap<RepairPlaceDTO, RepairPlaceVM>(MemberList.None).ReverseMap();
             CreateMap<StatusTypeDTO, StatusTypeVM>(MemberList.None).ReverseMap();
             CreateMap<UserDTO, UserVM>(MemberList.None).ReverseMap();
+
+            CreateMap<DivisionEquipmentDTO, DivisionEquipmentVM>(MemberList.None).ReverseMap();
+            CreateMap<AdministrationEquipmentDTO, AdministrationEquipmentVM>(MemberList.None).ReverseMap();
+            CreateMap<DepartmentEquipmentDTO, DepartmentEquipmentVM>(MemberList.None).ReverseMap();
+            CreateMap<StructuredEquipmentDTO, StructuredEquipmentVM>(MemberList.None).ReverseMap();
         }
     }
 }

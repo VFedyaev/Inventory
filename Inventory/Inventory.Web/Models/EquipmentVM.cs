@@ -25,5 +25,13 @@ namespace Inventory.Web.Models
         public ICollection<EquipmentComponentRelationDTO> EquipmentComponentRelations { get; set; }
         public ICollection<HistoryDTO> History { get; set; }
         public ICollection<EquipmentEmployeeRelationDTO> EquipmentEmployeeRelations { get; set; }
+
+        public string EquipmentTypeWithNumber
+        {
+            get
+            {
+                return $"{EquipmentType.Name} (Номер: {InventNumber})";
+            }
+        }
     }
 }

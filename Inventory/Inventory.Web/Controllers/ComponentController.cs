@@ -15,60 +15,66 @@ namespace Inventory.Web.Controllers
 {
     public class ComponentController : BaseController
     {
+        private const int ItemsPerPage = 10;
+
         public ComponentController(
             IComponentService compService,
             IComponentTypeService compTypeService,
             IEquipmentService equipService) : base(compService, compTypeService, equipService) { }
 
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxComponentList(int? page)
         {
-            int pageNumber = (page ?? 1);
+            string componentTypeId = Request.QueryString["ComponentTypeId"];
+            string modelName = Request.QueryString["ModelName"];
+            string name = Request.QueryString["Name"];
 
-            ViewBag.ComponentTypeId = GetComponentTypeIdSelectList();
-            ViewBag.ModelName = GetModelNameSelectList();
-            ViewBag.Name = GetComponentNameSelectList();
+            ViewBag.ComponentTypeId = GetComponentTypeIdSelectList(
+                string.IsNullOrEmpty(componentTypeId) ? (Guid?)null : Guid.Parse(componentTypeId));
+            ViewBag.ModelName = GetModelNameSelectList(modelName);
+            ViewBag.Name = GetComponentNameSelectList(name);
 
             FilterParamsDTO parameters = new FilterParamsDTO
             {
-                ComponentTypeId = Request.QueryString["componentTypeId"],
-                ModelName = Request.QueryString["modelName"],
-                Name = Request.QueryString["Name"]
+                ComponentTypeId = componentTypeId,
+                ModelName = modelName,
+                Name = name
             };
 
             IEnumerable<ComponentDTO> filteredComponentDTOList = ComponentService.GetFilteredList(parameters).ToList();
             IEnumerable<ComponentVM> filteredComponentVMList = Mapper.Map<IEnumerable<ComponentVM>>(filteredComponentDTOList);
 
-            return View(filteredComponentVMList.ToPagedList(pageNumber, PageSize));
+            return View(filteredComponentVMList.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
-            int pageNumber = (page ?? 1);
+            string componentTypeId = Request.QueryString["ComponentTypeId"];
+            string modelName = Request.QueryString["ModelName"];
+            string name = Request.QueryString["Name"];
 
             IEnumerable<ComponentDTO> componentDTOs = ComponentService
                 .GetAll()
                 .ToList();
             IEnumerable<ComponentVM> componentVMs = Mapper.Map<IEnumerable<ComponentVM>>(componentDTOs);
 
-            ViewBag.ComponentTypeId = GetComponentTypeIdSelectList();
-            ViewBag.ModelName = GetModelNameSelectList();
-            ViewBag.Name = GetComponentNameSelectList();
+            ViewBag.ComponentTypeId = GetComponentTypeIdSelectList(
+                string.IsNullOrEmpty(componentTypeId) ? (Guid?)null : Guid.Parse(componentTypeId));
+            ViewBag.ModelName = GetModelNameSelectList(modelName);
+            ViewBag.Name = GetComponentNameSelectList(name);
 
             FilterParamsDTO parameters = new FilterParamsDTO
             {
-                ComponentTypeId = Request.QueryString["componentTypeId"],
-                ModelName = Request.QueryString["modelName"],
-                Name = Request.QueryString["Name"]
+                ComponentTypeId = componentTypeId,
+                ModelName = modelName,
+                Name = name
             };
 
             IEnumerable<ComponentDTO> filteredComponentDTOList = ComponentService.GetFilteredList(parameters).ToList();
             IEnumerable<ComponentVM> filteredComponentVMList = Mapper.Map<IEnumerable<ComponentVM>>(filteredComponentDTOList);
 
-            return View(filteredComponentVMList.ToPagedList(pageNumber, PageSize));
+            return View(filteredComponentVMList.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]

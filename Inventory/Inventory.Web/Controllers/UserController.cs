@@ -16,6 +16,8 @@ namespace Inventory.Web.Controllers
 {
     public class UserController : Controller
     {
+        private const int ItemsPerPage = 10;
+
         private readonly IUserService UserService;
         private readonly IAccountService AccountService;
         
@@ -26,14 +28,10 @@ namespace Inventory.Web.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-
             var userDTOs = UserService.GetAllUsers().ToList();
-            var userVMs = Mapper.Map<IEnumerable<UserVM>>(userDTOs).ToPagedList(pageNumber, pageSize);
+            var userVMs = Mapper.Map<IEnumerable<UserVM>>(userDTOs).ToPagedList(page ?? 1, ItemsPerPage);
 
             return View(userVMs);
         }
@@ -52,14 +50,7 @@ namespace Inventory.Web.Controllers
                 Role = role
             };
 
-            var userRole = UserService.GetUserRole(userId);
-            var roles = AccountService.GetAllRoles().ToList();
-
-            ViewBag.Role = new SelectList(
-                roles,
-                "Name",
-                "Description",
-                model.Role);
+            ViewBag.Role = GetRoleNameSelectList(model.Role);
 
             return View(model);
         }
@@ -87,13 +78,7 @@ namespace Inventory.Web.Controllers
                     ModelState.AddModelError("", "Произошла ошибка. Попробуйте еще раз либо обратитесь к администратору.");
                 }
             }
-
-            var roles = AccountService.GetAllRoles().ToList();
-            ViewBag.Role = new SelectList(
-                roles,
-                "Name",
-                "Description",
-                model.Role);
+            ViewBag.Role = GetRoleNameSelectList(model.Role);
 
             return View();
         }
@@ -103,12 +88,13 @@ namespace Inventory.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(string id)
         {
-            if (id == null)
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-
             try
             {
                 await UserService.DeleteUser(id);
+            }
+            catch (ArgumentNullException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             catch (Exception)
             {
@@ -116,6 +102,11 @@ namespace Inventory.Web.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        private SelectList GetRoleNameSelectList(string selectedValue = null)
+        {
+            return new SelectList(AccountService.GetAllRoles().ToList(), "Name", "Description", selectedValue);
         }
     }
 }

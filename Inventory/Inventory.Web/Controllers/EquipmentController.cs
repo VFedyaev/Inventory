@@ -15,29 +15,29 @@ namespace Inventory.Web.Controllers
 {
     public class EquipmentController : BaseController
     {
+        private const int ItemsPerPage = 10;
+
         public EquipmentController
             (IEquipmentService equipService,
             IEmployeeService empService,
             IEquipmentTypeService equipTypeService) : base(equipService, equipTypeService, empService) { }
 
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult AjaxEquipmentList(int? page)
         {
             IEnumerable<EquipmentDTO> equipmentDTOs = EquipmentService.GetAll().ToList();
             IEnumerable<EquipmentVM> equipmentVMs = Mapper.Map<IEnumerable<EquipmentVM>>(equipmentDTOs);
 
-            return PartialView(equipmentVMs.ToPagedList(page ?? 1, PageSize));
+            return PartialView(equipmentVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager, user")]
-        [OutputCache(Duration = 30, Location = OutputCacheLocation.Downstream)]
         public ActionResult Index(int? page)
         {
             IEnumerable<EquipmentDTO> equipmentDTOs = EquipmentService.GetAll().ToList();
             IEnumerable<EquipmentVM> equipmentVMs = Mapper.Map<IEnumerable<EquipmentVM>>(equipmentDTOs);
 
-            return View(equipmentVMs.ToPagedList(page ?? 1, PageSize));
+            return View(equipmentVMs.ToPagedList(page ?? 1, ItemsPerPage));
         }
 
         [Authorize(Roles = "admin, manager")]
@@ -209,11 +209,6 @@ namespace Inventory.Web.Controllers
         {
             try
             {
-                string imagePath = Request.MapPath($"/Content/Images/{id}.jpg");
-                if (System.IO.File.Exists(imagePath))
-                {
-                    System.IO.File.Delete(imagePath);
-                }
                 EquipmentService.Delete(id);
             }
             catch (NotFoundException) { return HttpNotFound(); }

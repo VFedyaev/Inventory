@@ -27,9 +27,28 @@ namespace Inventory.BLL.Services
             return Mapper.Map<StatusTypeDTO>(statusType);
         }
 
+        public StatusTypeDTO Get(Guid? id)
+        {
+            if (id == null)
+                throw new ArgumentNullException();
+
+            StatusType statusType = _unitOfWork.StatusTypes.Get(id);
+            if (statusType == null)
+                throw new NotFoundException();
+
+            return Mapper.Map<StatusTypeDTO>(statusType);
+        }
+
         public IEnumerable<StatusTypeDTO> GetAll()
         {
             List<StatusType> statusTypes = _unitOfWork.StatusTypes.GetAll().ToList();
+
+            return Mapper.Map<IEnumerable<StatusTypeDTO>>(statusTypes);
+        }
+
+        public IEnumerable<StatusTypeDTO> GetListOrderedByName()
+        {
+            List<StatusType> statusTypes = _unitOfWork.StatusTypes.GetAll().OrderBy(t => t.Name).ToList();
 
             return Mapper.Map<IEnumerable<StatusTypeDTO>>(statusTypes);
         }
