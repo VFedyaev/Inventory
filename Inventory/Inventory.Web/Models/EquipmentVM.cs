@@ -30,7 +30,7 @@ namespace Inventory.Web.Models
         {
             get
             {
-                return $"{EquipmentType.Name} (Номер: {InventNumber}";
+                return $"{EquipmentType.Name} (Номер: {InventNumber})";
             }
         }
     }

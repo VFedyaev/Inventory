@@ -129,6 +129,8 @@ namespace Inventory.BLL.Services
                 return true;
             if (HasRelationsWithComponents(id))
                 return true;
+            if (HasRelationsWithHistory(id))
+                return true;
 
             return false;
         }
@@ -143,6 +145,13 @@ namespace Inventory.BLL.Services
         private bool HasRelationsWithComponents(Guid id)
         {
             var relations = _unitOfWork.EquipmentComponentRelations.Find(r => r.EquipmentId == id);
+
+            return relations.Count() > 0;
+        }
+
+        private bool HasRelationsWithHistory(Guid id)
+        {
+            var relations = _unitOfWork.History.Find(h => h.EquipmentId == id);
 
             return relations.Count() > 0;
         }
