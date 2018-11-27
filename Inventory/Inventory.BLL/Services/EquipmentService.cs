@@ -120,6 +120,13 @@ namespace Inventory.BLL.Services
                 throw new NotFoundException();
 
             _unitOfWork.Equipments.Delete(id);
+
+            string imagePath = HttpContext.Current.Request.MapPath($"/Content/Images/{id}.jpg");
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+
             _unitOfWork.Save();
         }
 

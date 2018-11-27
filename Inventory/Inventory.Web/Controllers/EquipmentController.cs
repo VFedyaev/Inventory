@@ -209,11 +209,6 @@ namespace Inventory.Web.Controllers
         {
             try
             {
-                string imagePath = Request.MapPath($"/Content/Images/{id}.jpg");
-                if (System.IO.File.Exists(imagePath))
-                {
-                    System.IO.File.Delete(imagePath);
-                }
                 EquipmentService.Delete(id);
             }
             catch (NotFoundException) { return HttpNotFound(); }
