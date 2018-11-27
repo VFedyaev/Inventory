@@ -2,7 +2,6 @@
 using Inventory.BLL.Interfaces;
 using Inventory.BLL.Infrastructure;
 using Inventory.Web.Models.Account;
-using Inventory.Web.Util;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -194,7 +193,7 @@ namespace Inventory.Web.Controllers
                 }
                 catch (OldPasswordIsWrongException)
                 {
-                    ModelState.AddModelError("OldPassword", "Пароль неверн.");
+                    ModelState.AddModelError("OldPassword", "Пароль неверен.");
                 }
                 catch (InsecurePasswordException)
                 {
