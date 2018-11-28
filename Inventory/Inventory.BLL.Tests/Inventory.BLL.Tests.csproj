@@ -72,12 +72,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MappingProfiles\AutoMapperProfile.cs" />
-    <Compile Include="MoqRepositories\MoqComponentRepository.cs" />
-    <Compile Include="MoqRepositories\MoqComponentTypeRepository.cs" />
-    <Compile Include="MoqRepositories\MoqEmployeeRepository.cs" />
-    <Compile Include="MoqRepositories\MoqEquipmentComponentRelationRepository.cs" />
-    <Compile Include="MoqRepositories\MoqEquipmentRepository.cs" />
-    <Compile Include="MoqRepositories\MoqEquipmentTypeRepository.cs" />
+    <Compile Include="MoqRepositories\MoqBaseRepository.cs" />
+    <Compile Include="MoqRepositories\MoqPartialRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services.Tests\BaseInit.cs" />
     <Compile Include="Services.Tests\ComponentService_Tests.cs" />

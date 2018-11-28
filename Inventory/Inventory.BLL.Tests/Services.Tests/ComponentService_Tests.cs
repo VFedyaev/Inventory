@@ -1,7 +1,6 @@
 ﻿using Inventory.BLL.DTO;
 using Inventory.BLL.Infrastructure;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,29 +13,51 @@ namespace Inventory.BLL.Tests.Services.Tests
         [TestInitialize]
         public void TestIntitialize()
         {
-            base.ComponentAndComponentTypeInit();
+            base.Initialize();
         }
 
         [TestMethod]
-        public void GetMethodReturnsComponentDTOItem()
+        public void Get_Method_Returns_ComponentDTO_Item()
         {
             // arrange
-            var itemEntityType = moqComponentRepository.Components.First().GetType();
-            var expectedItemId = moqComponentRepository.Components.First().Id;
-            var expectedItemInventNumber = moqComponentRepository.Components.First().InventNumber;
+            var expectedItemId = moqComponentRepository.Items.First().Id;
 
             // act
-            var item = ComponentService.Get(expectedItemId) as ComponentDTO;
+            var item = ComponentService.Get(expectedItemId);
 
             // assert
-            Assert.AreNotEqual(itemEntityType, item.GetType());
             Assert.AreEqual(expectedItemId, item.Id);
+        }
+
+        [TestMethod]
+        public void Get_Method_Returns_Item_With_ComponentDTO_Type()
+        {
+            // arrange
+            var entityType = moqComponentRepository.Items.First().GetType();
+
+            // act
+            var item = ComponentService.Get(moqComponentRepository.Items.First().Id) as ComponentDTO;
+
+            // assert
+            Assert.AreNotEqual(entityType, item.GetType());
+        }
+
+        [TestMethod]
+        public void Get_Method_Returns_Item_With_His_Fields()
+        {
+            // arrange
+            var expectedItemInventNumber = moqComponentRepository.Items.First().InventNumber;
+
+            // act
+            var item = ComponentService.Get(moqComponentRepository.Items.First().Id);
+
+            // assert
             Assert.AreEqual(expectedItemInventNumber, item.InventNumber);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void GetmethodWithNullIdThrowsArgumentNullException()
+        public void Get_Method_With_Null_Id_Throws_ArgumentNullException()
         {
             // act // assert
             ComponentService.Get(null);
@@ -44,17 +65,17 @@ namespace Inventory.BLL.Tests.Services.Tests
 
         [TestMethod]
         [ExpectedException(typeof(NotFoundException))]
-        public void GetMethodWithWrongIdThrowsNotFoundException()
+        public void Get_Method_With_Wrong_Id_Throws_NotFoundException()
         {
             // act //assert
             ComponentService.Get((Guid?)Guid.NewGuid());
         }
 
         [TestMethod]
-        public void GetAllMethodReturnsAllItemsList()
+        public void GetAll_Method_Returns_All_Items_List()
         {
             // arrange
-            int expectedItemsCount = moqComponentRepository.Components.Count();
+            int expectedItemsCount = moqComponentRepository.Items.Count();
 
             // act
             var items = ComponentService.GetAll() as IEnumerable<ComponentDTO>;
@@ -64,15 +85,15 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void GetFilteredListReturnsListFilteredByComponentTypeId()
+        public void GetFilteredList_Method_Returns_List_Filtered_By_ComponentTypeId()
         {
             // arrange
-            Guid ComponentTypeId = moqComponentTypeRepository.Types.First().Id;
+            Guid ComponentTypeId = moqComponentTypeRepository.Items.First().Id;
             FilterParamsDTO parameters = new FilterParamsDTO
             {
                 ComponentTypeId = ComponentTypeId.ToString()
             };
-            int expectedItemsCount = moqComponentRepository.Components.Where(c => c.ComponentTypeId == ComponentTypeId).Count();
+            int expectedItemsCount = moqComponentRepository.Items.Where(c => c.ComponentTypeId == ComponentTypeId).Count();
 
             // act
             var items = ComponentService.GetFilteredList(parameters) as IEnumerable<ComponentDTO>;
@@ -83,15 +104,15 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void GetFilteredListReturnsListFilteredByModelName()
+        public void Get_Filtered_List_Method_Returns_List_Filtered_By_ModelName()
         {
             // arrange
-            string ModelName = moqComponentRepository.Components.First().ModelName;
+            string ModelName = moqComponentRepository.Items.First().ModelName;
             FilterParamsDTO parameters = new FilterParamsDTO
             {
                 ModelName = ModelName
             };
-            int expectedItemsCount = moqComponentRepository.Components.Where(c => c.ModelName == ModelName).Count();
+            int expectedItemsCount = moqComponentRepository.Items.Where(c => c.ModelName == ModelName).Count();
 
             // act
             var items = ComponentService.GetFilteredList(parameters) as IEnumerable<ComponentDTO>;
@@ -102,15 +123,15 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void GetFilteredListReturnsListFilteredByName()
+        public void GetFilteredList_Method_Returns_List_Filtered_By_Name()
         {
             // arrange
-            string Name = moqComponentRepository.Components.Last().Name;
+            string Name = moqComponentRepository.Items.Last().Name;
             FilterParamsDTO parameters = new FilterParamsDTO
             {
                 Name = Name
             };
-            int expectedItemsCount = moqComponentRepository.Components.Where(c => c.Name == Name).Count();
+            int expectedItemsCount = moqComponentRepository.Items.Where(c => c.Name == Name).Count();
 
             // act
             var items = ComponentService.GetFilteredList(parameters) as IEnumerable<ComponentDTO>;
@@ -121,19 +142,19 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void GetFilteredListReturnsListFilteredByAllParams()
+        public void GetFilteredList_Method_Returns_List_Filtered_By_All_Params()
         {
             // arrange
-            string Name = moqComponentRepository.Components.Last().Name;
-            string ModelName = moqComponentRepository.Components.Last().ModelName;
-            Guid ComponentTypeId = moqComponentRepository.Components.Last().ComponentTypeId;
+            string Name = moqComponentRepository.Items.Last().Name;
+            string ModelName = moqComponentRepository.Items.Last().ModelName;
+            Guid ComponentTypeId = moqComponentRepository.Items.Last().ComponentTypeId;
             FilterParamsDTO parameters = new FilterParamsDTO
             {
                 Name = Name,
                 ModelName = ModelName,
                 ComponentTypeId = ComponentTypeId.ToString()
             };
-            int expectedItemsCount = moqComponentRepository.Components.Where(c =>
+            int expectedItemsCount = moqComponentRepository.Items.Where(c =>
             {
                 return c.Name == Name && c.ModelName == ModelName && c.ComponentTypeId == ComponentTypeId;
             }).Count();
@@ -149,12 +170,12 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void GetFilteredListReturnsListOrderedByName()
+        public void GetFilteredList_Method_Returns_List_Ordered_By_Name()
         {
             // arrange
-            int expectedItemsCount = moqComponentRepository.Components.Count();
-            Guid expectedFirstItemId = moqComponentRepository.Components.OrderBy(c => c.Name).First().Id;
-            Guid expectedLastItemId = moqComponentRepository.Components.OrderBy(c => c.Name).Last().Id;
+            int expectedItemsCount = moqComponentRepository.Items.Count();
+            Guid expectedFirstItemId = moqComponentRepository.Items.OrderBy(c => c.Name).First().Id;
+            Guid expectedLastItemId = moqComponentRepository.Items.OrderBy(c => c.Name).Last().Id;
 
             // act
             var items = ComponentService.GetFilteredList(new FilterParamsDTO()) as IEnumerable<ComponentDTO>;
@@ -166,32 +187,43 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void AddAndGetIdCreatesItemAndReturnsId()
+        public void AddAndGetId_Method_Returns_Id()
+        {
+            // arrange
+            ComponentDTO item = new ComponentDTO { ComponentTypeId = moqComponentTypeRepository.Items.First().Id };
+
+            // act
+            var id = ComponentService.AddAndGetId(item) as Guid?;
+
+            // assert
+            Assert.IsNotNull(id);
+        }
+
+        [TestMethod]
+        public void AddAndGetId_Method_Creates_Ite()
         {
             // arrange
             ComponentDTO item = new ComponentDTO
             {
-                ComponentTypeId = moqComponentTypeRepository.Types.First().Id,
+                ComponentTypeId = moqComponentTypeRepository.Items.First().Id,
                 Name = $"Name-{DateTime.Now}",
                 ModelName = $"Modelname-{DateTime.Now}"
             };
 
             // act
-            var createdItemId = ComponentService.AddAndGetId(item) as Guid?;
+            var createdItemId = ComponentService.AddAndGetId(item);
 
             // assert
-            Assert.IsNotNull(createdItemId);
-            Assert.IsTrue(moqComponentRepository.Components.Any(c => c.Name == item.Name));
+            Assert.IsTrue(moqComponentRepository.Items.Any(c => c.Name == item.Name));
         }
 
         [TestMethod]
-        public void AddMethodCreatesItem()
+        public void Add_Method_Creates_Item()
         {
             // arrange
-            int expectedItemsCount = moqComponentRepository.Components.Count() + 1;
             ComponentDTO item = new ComponentDTO
             {
-                ComponentTypeId = moqComponentTypeRepository.Types.First().Id,
+                ComponentTypeId = moqComponentTypeRepository.Items.First().Id,
                 Name = $"Name-{DateTime.Now}"
             };
 
@@ -199,17 +231,30 @@ namespace Inventory.BLL.Tests.Services.Tests
             ComponentService.Add(item);
 
             // assert
-            Assert.IsTrue(moqComponentRepository.Components.Any(c => c.Name == item.Name));
-            Assert.AreEqual(expectedItemsCount, moqComponentRepository.Components.Count());
+            Assert.IsTrue(moqComponentRepository.Items.Any(c => c.Name == item.Name));
         }
 
         [TestMethod]
-        public void UpdateMethodUpdatesItemFields()
+        public void After_Add_Method_Number_Of_Items_Increases()
         {
             // arrange
-            var expectedItemId = moqComponentRepository.Components.First().Id;
-            string modelNameThatWillBeUpdated = moqComponentRepository.Components.First().ModelName;
-            string nameThatWillBeUpdated = moqComponentRepository.Components.First().Name;
+            int expectedItemsCount = moqComponentRepository.Items.Count() + 1;
+            var item = new ComponentDTO { ComponentTypeId = moqComponentTypeRepository.Items.First().Id };
+
+            // act
+            ComponentService.Add(item);
+
+            // assert
+            Assert.AreEqual(expectedItemsCount, moqComponentRepository.Items.Count());
+        }
+
+        [TestMethod]
+        public void Update_Method_Updates_Item_Fields()
+        {
+            // arrange
+            var expectedItemId = moqComponentRepository.Items.First().Id;
+            string modelNameThatWillBeUpdated = moqComponentRepository.Items.First().ModelName;
+            string nameThatWillBeUpdated = moqComponentRepository.Items.First().Name;
             var item = new ComponentDTO
             {
                 Id = expectedItemId,
@@ -219,7 +264,7 @@ namespace Inventory.BLL.Tests.Services.Tests
 
             // act
             ComponentService.Update(item);
-            var updatedItem = moqComponentRepository.Components.Where(c => c.Id == expectedItemId).First();
+            var updatedItem = moqComponentRepository.Items.Where(c => c.Id == expectedItemId).First();
 
             // assert
             Assert.AreEqual(expectedItemId, updatedItem.Id);
@@ -230,9 +275,119 @@ namespace Inventory.BLL.Tests.Services.Tests
         }
 
         [TestMethod]
-        public void DeleteMethodRemovesItemWithoutRelations()
+        public void Delete_Method_Removes_Item_Without_Relations_With_Equipment()
         {
+            // arrange
+            int expectedItemsCount = moqComponentRepository.Items.Count() - 1;
 
+            // act
+            ComponentService.Delete(moqComponentRepository.Items.Where(i =>
+            {
+                return !moqEquipCompRelRepository.Items.Select(r => r.ComponentId).Contains(i.Id);
+            }).First().Id);
+
+            // assert
+            Assert.AreEqual(expectedItemsCount, moqComponentRepository.Items.Count());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(HasRelationsException))]
+        public void Delete_Method_Throws_Exception_If_Item_Has_Relations_With_Equipment()
+        {
+            // act // assert
+            ComponentService.Delete(moqEquipCompRelRepository.Items.First().ComponentId);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotFoundException))]
+        public void Delete_Method_With_Wrong_Id_Throws_NotFoundException()
+        {
+            // act // assert
+            ComponentService.Delete(Guid.NewGuid());
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_Type_Name()
+        {
+            // arrange
+            var componentType = moqComponentTypeRepository.Items.First();
+            var expectedItems = moqComponentRepository.Items.Where(c => c.ComponentTypeId == componentType.Id);
+
+            // act
+            var items = ComponentService.GetComponentsBy("type", componentType.Name.ToLower());
+
+            // assert
+            Assert.AreEqual(expectedItems.Count(), items.Count());
+            Assert.IsTrue(items.All(i => i.ComponentTypeId == componentType.Id));
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_ModelName()
+        {
+            // arrange
+            var modelName = moqComponentRepository.Items.First().ModelName;
+            var expectedItems = moqComponentRepository.Items.Where(c => c.ModelName == modelName);
+
+            // act
+            var items = ComponentService.GetComponentsBy("model", modelName.ToLower());
+
+            // assert
+            Assert.AreEqual(expectedItems.Count(), items.Count());
+            Assert.IsTrue(items.All(i => i.ModelName == modelName));
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_InventNumber()
+        {
+            // arrange
+            var inventNumber = moqComponentRepository.Items.First().InventNumber;
+            var expectedItems = moqComponentRepository.Items.Where(c => c.InventNumber == inventNumber);
+
+            // act
+            var items = ComponentService.GetComponentsBy("number", inventNumber.ToLower()) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.AreEqual(expectedItems.Count(), items.Count());
+            Assert.IsTrue(items.All(i => i.InventNumber == inventNumber));
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_With_Wrong_InventNUmber_Returns_Empty_List()
+        {
+            // arrange
+            string inventNumber = $"{DateTime.Now}";
+
+            // act
+            var items = ComponentService.GetComponentsBy("number", inventNumber) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.IsTrue(items.Count() == 0);
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_With_Wrong_Type_Returns_Empty_List()
+        {
+            // arrange
+            string typeName = $"{DateTime.Now}";
+
+            // act
+            var items = ComponentService.GetComponentsBy("type", typeName) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.IsTrue(items.Count() == 0);
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_With_Wrong_ModelName_Returns_Empty_List()
+        {
+            // arrange
+            string modelName = $"{DateTime.Now}";
+
+            // act
+            var items = ComponentService.GetComponentsBy("model", modelName) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.IsTrue(items.Count() == 0);
         }
     }
 }
