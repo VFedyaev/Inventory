@@ -1,4 +1,5 @@
-﻿using Inventory.DAL.Interfaces;
+﻿using CatalogEntities;
+using Inventory.DAL.Interfaces;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,13 @@ namespace Inventory.BLL.Tests.MoqRepositories
 
         private int GetItemIdValue(T item)
         {
-            return (int)item.GetType().GetProperties().Where(p => p.Name == "Id").First().GetValue(item);
+            string type = typeof(T).ToString().Split('.').Last();
+            return GetValue(item, type);
+        }
+
+        private int GetValue(T item, string type)
+        {
+            return (int)item.GetType().GetProperties().Where(p => p.Name == $"{type}Id").First().GetValue(item);
         }
     }
 }

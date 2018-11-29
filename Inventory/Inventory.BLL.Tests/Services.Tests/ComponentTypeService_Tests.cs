@@ -14,7 +14,7 @@ namespace Inventory.BLL.Tests.Services.Tests
         [TestInitialize]
         public void TestInitialize()
         {
-            base.Initialize();
+            base.ComponentInitialize();
         }
 
         [TestMethod]

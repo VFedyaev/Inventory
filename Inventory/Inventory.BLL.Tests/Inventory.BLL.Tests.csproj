@@ -75,10 +75,12 @@
     <Compile Include="MappingProfiles\AutoMapperProfile.cs" />
     <Compile Include="MoqRepositories\MoqBaseRepository.cs" />
     <Compile Include="MoqRepositories\MoqPartialRepository.cs" />
+    <Compile Include="MoqRepositories\TestData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services.Tests\BaseInit.cs" />
     <Compile Include="Services.Tests\ComponentService_Tests.cs" />
     <Compile Include="Services.Tests\ComponentTypeService_Tests.cs" />
+    <Compile Include="Services.Tests\EmployeeService_Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -13,91 +13,7 @@ namespace Inventory.BLL.Tests.Services.Tests
         [TestInitialize]
         public void TestIntitialize()
         {
-            base.Initialize();
-        }
-
-        [TestMethod]
-        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_Type_Name()
-        {
-            // arrange
-            var componentType = moqComponentTypeRepository.Items.First();
-            var expectedItems = moqComponentRepository.Items.Where(c => c.ComponentTypeId == componentType.Id);
-
-            // act
-            var items = ComponentService.GetComponentsBy("type", componentType.Name.ToLower());
-
-            // assert
-            Assert.AreEqual(expectedItems.Count(), items.Count());
-            Assert.IsTrue(items.All(i => i.ComponentTypeId == componentType.Id));
-        }
-
-        [TestMethod]
-        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_ModelName()
-        {
-            // arrange
-            var modelName = moqComponentRepository.Items.First().ModelName;
-            var expectedItems = moqComponentRepository.Items.Where(c => c.ModelName == modelName);
-
-            // act
-            var items = ComponentService.GetComponentsBy("model", modelName.ToLower());
-
-            // assert
-            Assert.AreEqual(expectedItems.Count(), items.Count());
-            Assert.IsTrue(items.All(i => i.ModelName == modelName));
-        }
-
-        [TestMethod]
-        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_InventNumber()
-        {
-            // arrange
-            var inventNumber = moqComponentRepository.Items.First().InventNumber;
-            var expectedItems = moqComponentRepository.Items.Where(c => c.InventNumber == inventNumber);
-
-            // act
-            var items = ComponentService.GetComponentsBy("number", inventNumber.ToLower()) as IEnumerable<ComponentDTO>;
-
-            // assert
-            Assert.AreEqual(expectedItems.Count(), items.Count());
-            Assert.IsTrue(items.All(i => i.InventNumber == inventNumber));
-        }
-
-        [TestMethod]
-        public void GetComponentsBy_Method_With_Wrong_InventNUmber_Returns_Empty_List()
-        {
-            // arrange
-            string inventNumber = $"{DateTime.Now}";
-
-            // act
-            var items = ComponentService.GetComponentsBy("number", inventNumber) as IEnumerable<ComponentDTO>;
-
-            // assert
-            Assert.IsTrue(items.Count() == 0);
-        }
-
-        [TestMethod]
-        public void GetComponentsBy_Method_With_Wrong_Type_Returns_Empty_List()
-        {
-            // arrange
-            string typeName = $"{DateTime.Now}";
-
-            // act
-            var items = ComponentService.GetComponentsBy("type", typeName) as IEnumerable<ComponentDTO>;
-
-            // assert
-            Assert.IsTrue(items.Count() == 0);
-        }
-
-        [TestMethod]
-        public void GetComponentsBy_Method_With_Wrong_ModelName_Returns_Empty_List()
-        {
-            // arrange
-            string modelName = $"{DateTime.Now}";
-
-            // act
-            var items = ComponentService.GetComponentsBy("model", modelName) as IEnumerable<ComponentDTO>;
-
-            // assert
-            Assert.IsTrue(items.Count() == 0);
+            base.ComponentInitialize();
         }
 
         [TestMethod]
@@ -274,7 +190,13 @@ namespace Inventory.BLL.Tests.Services.Tests
         public void AddAndGetId_Method_Returns_Id()
         {
             // arrange
-            ComponentDTO item = new ComponentDTO { ComponentTypeId = moqComponentTypeRepository.Items.First().Id };
+            ComponentDTO item = new ComponentDTO
+            {
+                ComponentTypeId = moqComponentTypeRepository.Items.First().Id,
+                Name = $"Name-{DateTime.Now}",
+                ModelName = $"ModelName-{DateTime.Now}",
+                InventNumber = $"Number-{DateTime.Now}"
+            };
 
             // act
             var id = ComponentService.AddAndGetId(item) as Guid?;
@@ -291,7 +213,8 @@ namespace Inventory.BLL.Tests.Services.Tests
             {
                 ComponentTypeId = moqComponentTypeRepository.Items.First().Id,
                 Name = $"Name-{DateTime.Now}",
-                ModelName = $"Modelname-{DateTime.Now}"
+                ModelName = $"Modelname-{DateTime.Now}",
+                InventNumber = $"Number-{DateTime.Now}"
             };
 
             // act
@@ -308,7 +231,9 @@ namespace Inventory.BLL.Tests.Services.Tests
             ComponentDTO item = new ComponentDTO
             {
                 ComponentTypeId = moqComponentTypeRepository.Items.First().Id,
-                Name = $"Name-{DateTime.Now}"
+                Name = $"Name-{DateTime.Now}",
+                ModelName = $"ModelName-{DateTime.Now}",
+                InventNumber = $"Number-{DateTime.Now}"
             };
 
             // act
@@ -323,7 +248,13 @@ namespace Inventory.BLL.Tests.Services.Tests
         {
             // arrange
             int expectedItemsCount = moqComponentRepository.Items.Count() + 1;
-            var item = new ComponentDTO { ComponentTypeId = moqComponentTypeRepository.Items.First().Id };
+            var item = new ComponentDTO
+            {
+                ComponentTypeId = moqComponentTypeRepository.Items.First().Id,
+                Name = $"Name-{DateTime.Now}",
+                ModelName = $"ModelName-{DateTime.Now}",
+                InventNumber = $"Number-{DateTime.Now}"
+            };
 
             // act
             ComponentService.Add(item);
@@ -389,6 +320,90 @@ namespace Inventory.BLL.Tests.Services.Tests
         {
             // act // assert
             ComponentService.Delete(Guid.NewGuid());
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_InventNumber()
+        {
+            // arrange
+            var inventNumber = moqComponentRepository.Items.First().InventNumber;
+            var expectedItems = moqComponentRepository.Items.Where(c => c.InventNumber == inventNumber);
+
+            // act
+            var items = ComponentService.GetComponentsBy("number", inventNumber.ToLower()) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.AreEqual(expectedItems.Count(), items.Count());
+            Assert.IsTrue(items.All(i => i.InventNumber == inventNumber));
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_Type_Name()
+        {
+            // arrange
+            var componentType = moqComponentTypeRepository.Items.First();
+            var expectedItems = moqComponentRepository.Items.Where(c => c.ComponentTypeId == componentType.Id);
+
+            // act
+            var items = ComponentService.GetComponentsBy("type", componentType.Name.ToLower());
+
+            // assert
+            Assert.AreEqual(expectedItems.Count(), items.Count());
+            Assert.IsTrue(items.All(i => i.ComponentTypeId == componentType.Id));
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_Returns_Component_List_Filtered_By_ModelName()
+        {
+            // arrange
+            var modelName = moqComponentRepository.Items.First().ModelName;
+            var expectedItems = moqComponentRepository.Items.Where(c => c.ModelName == modelName);
+
+            // act
+            var items = ComponentService.GetComponentsBy("model", modelName.ToLower());
+
+            // assert
+            Assert.AreEqual(expectedItems.Count(), items.Count());
+            Assert.IsTrue(items.All(i => i.ModelName == modelName));
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_With_Wrong_InventNUmber_Returns_Empty_List()
+        {
+            // arrange
+            string inventNumber = $"{DateTime.Now}";
+
+            // act
+            var items = ComponentService.GetComponentsBy("number", inventNumber) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.IsTrue(items.Count() == 0);
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_With_Wrong_Type_Returns_Empty_List()
+        {
+            // arrange
+            string typeName = $"{DateTime.Now}";
+
+            // act
+            var items = ComponentService.GetComponentsBy("type", typeName) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.IsTrue(items.Count() == 0);
+        }
+
+        [TestMethod]
+        public void GetComponentsBy_Method_With_Wrong_ModelName_Returns_Empty_List()
+        {
+            // arrange
+            string modelName = $"{DateTime.Now}";
+
+            // act
+            var items = ComponentService.GetComponentsBy("model", modelName) as IEnumerable<ComponentDTO>;
+
+            // assert
+            Assert.IsTrue(items.Count() == 0);
         }
     }
 }
