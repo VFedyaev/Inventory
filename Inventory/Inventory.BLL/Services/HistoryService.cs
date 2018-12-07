@@ -100,7 +100,7 @@ namespace Inventory.BLL.Services
                 filteredList = filteredList.Where(h => h.StatusTypeId == guidStatusTypeId);
             }
 
-            return filteredList.OrderBy(h => h.Employee.EmployeeFullName);
+            return filteredList.OrderBy(h => h.Employee.FullName);
         }
 
         public void Dispose()

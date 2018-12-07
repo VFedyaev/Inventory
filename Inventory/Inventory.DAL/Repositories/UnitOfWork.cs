@@ -3,11 +3,17 @@ using Inventory.DAL.Entities;
 using Inventory.DAL.Interfaces;
 using CatalogEntities;
 using System;
+using Microsoft.AspNet.Identity;
+using Inventory.DAL.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Threading.Tasks;
 
 namespace Inventory.DAL.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
+        private InventoryContext context;
+
         private BaseRepository<Component> componentRepository;
         private BaseRepository<ComponentType> componentTypeRepository;
         private BaseRepository<Equipment> equipmentRepository;
@@ -24,12 +30,26 @@ namespace Inventory.DAL.Repositories
         private PartialRepository<Administration> administrationRepository;
         private PartialRepository<Division> divisionRepository;
 
-        private InventoryContext context;
+        PasswordValidator passwordValidator = new PasswordValidator
+        {
+            RequiredLength = 8,
+            RequireNonLetterOrDigit = true,
+            RequireDigit = true,
+            RequireLowercase = true
+        };
 
         public UnitOfWork(string connectionString)
         {
             context = new InventoryContext(connectionString);
+            UserManager = new ApplicationUserManager(new UserStore<ApplicationUser>(context));
+            RoleManager = new ApplicationRoleManager(new RoleStore<ApplicationRole>(context));
+
+            UserManager.PasswordValidator = passwordValidator;
+            UserManager.UserValidator = new AppUserValidator(UserManager);
         }
+
+        public ApplicationUserManager UserManager { get; }
+        public ApplicationRoleManager RoleManager { get; }
 
         public IRepository<Component> Components
         {
@@ -171,6 +191,11 @@ namespace Inventory.DAL.Repositories
             }
         }
 
+        public async Task SaveAsync()
+        {
+            await context.SaveChangesAsync();
+        }
+
         public void Save()
         {
             context.SaveChanges();
@@ -182,7 +207,11 @@ namespace Inventory.DAL.Repositories
             if (!this.disposed)
             {
                 if (disposing)
+                {
+                    UserManager.Dispose();
+                    RoleManager.Dispose();
                     context.Dispose();
+                }
                 this.disposed = true;
             }
         }

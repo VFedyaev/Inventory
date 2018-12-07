@@ -122,7 +122,7 @@ namespace Inventory.Web.Controllers
 
         public SelectList GetEmployeeIdSelectList(int? selectedValue = null)
         {
-            return new SelectList(EmployeeService.GetAll().ToList(), "EmployeeId", "EmployeeFullName", selectedValue);
+            return new SelectList(EmployeeService.GetAll().ToList(), "Id", "FullName", selectedValue);
         }
     }
 }

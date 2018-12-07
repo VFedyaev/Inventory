@@ -68,7 +68,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EF\IdentityContext.cs" />
     <Compile Include="EF\InventoryContext.cs" />
     <Compile Include="Entities\ApplicationRole.cs" />
     <Compile Include="Entities\Component.cs" />
@@ -84,7 +83,6 @@
     <Compile Include="Identity\ApplicationRoleManager.cs" />
     <Compile Include="Identity\ApplicationUserManager.cs" />
     <Compile Include="Identity\AppUserValidator.cs" />
-    <Compile Include="Interfaces\IAccountWorker.cs" />
     <Compile Include="Interfaces\IPartialRepository.cs" />
     <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
@@ -92,7 +90,6 @@
     <Compile Include="Repositories\BaseRepository.cs" />
     <Compile Include="Repositories\PartialRepository.cs" />
     <Compile Include="Repositories\UnitOfWork.cs" />
-    <Compile Include="Repositories\AccountWorker.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

@@ -47,7 +47,7 @@
                         <p><b>@Html.DisplayFor(modelItem => item.EquipmentType.Name)</b></p>
                         <p><b>@Html.DisplayNameFor(model => model.First().InventNumber):</b> @Html.DisplayFor(modelItem => item.InventNumber)</p>
                         <p><b>@Html.DisplayNameFor(model => model.First().Supplier):</b> @Html.DisplayFor(modelItem => item.Supplier)</p>
-                        <p><b>Текущий владелец:</b> @Html.DisplayFor(modelItem => item.EquipmentEmployeeRelations.Where(r => r.IsOwner == true).FirstOrDefault().Employee.EmployeeFullName)</p>
+                        <p><b>Текущий владелец:</b> @Html.DisplayFor(modelItem => item.EquipmentEmployeeRelations.Where(r => r.IsOwner == true).FirstOrDefault().Employee.FullName)</p>
                     </div>
                     @if (User.IsInRole("admin"))
                     {

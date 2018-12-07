@@ -45,13 +45,12 @@ namespace Inventory.BLL.Tests.MoqRepositories
 
         private int GetItemIdValue(T item)
         {
-            string type = typeof(T).ToString().Split('.').Last();
-            return GetValue(item, type);
+            return GetValue(item);
         }
 
-        private int GetValue(T item, string type)
+        private int GetValue(T item)
         {
-            return (int)item.GetType().GetProperties().Where(p => p.Name == $"{type}Id").First().GetValue(item);
+            return (int)item.GetType().GetProperties().Where(p => p.Name == "Id").First().GetValue(item);
         }
     }
 }

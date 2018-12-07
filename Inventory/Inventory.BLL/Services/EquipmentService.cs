@@ -180,29 +180,29 @@ namespace Inventory.BLL.Services
                 join
                     emp in _unitOfWork.Employees.GetAll()
                 on
-                    relation.EmployeeId equals emp.EmployeeId
+                    relation.EmployeeId equals emp.Id
                 join
                     pos in _unitOfWork.Positions.GetAll()
                 on
-                    emp.PositionId equals pos.PositionId
+                    emp.PositionId equals pos.Id
                 join
                     dep in _unitOfWork.Departments.GetAll()
                 on
-                    emp.DepartmentId equals dep.DepartmentId
+                    emp.DepartmentId equals dep.Id
                 join
                     adm in _unitOfWork.Administrations.GetAll()
                 on
-                    dep.AdministrationId equals adm.AdministrationId
+                    dep.AdministrationId equals adm.Id
                 where
                     relation.EquipmentId == id
                 select new OwnerInfoDTO
                 {
-                    EmployeeId = emp.EmployeeId,
-                    FullName = emp.EmployeeFullName,
-                    Room = emp.EmployeeRoom,
-                    Position = pos.PositionName,
-                    Department = dep.DepartmentName,
-                    Administration = adm.AdministrationName,
+                    EmployeeId = emp.Id,
+                    FullName = emp.FullName,
+                    Room = emp.Room,
+                    Position = pos.Name,
+                    Department = dep.Name,
+                    Administration = adm.Name,
                     StartDate = relation.CreatedAt,
                     EndDate = relation.UpdatedAt,
                     IsActual = relation.IsOwner
@@ -222,34 +222,34 @@ namespace Inventory.BLL.Services
                 join
                     emp in _unitOfWork.Employees.GetAll()
                 on
-                    relation.EmployeeId equals emp.EmployeeId
+                    relation.EmployeeId equals emp.Id
                 join
                     pos in _unitOfWork.Positions.GetAll()
                 on
-                    emp.PositionId equals pos.PositionId
+                    emp.PositionId equals pos.Id
                 join
                     dep in _unitOfWork.Departments.GetAll()
                 on
-                    emp.DepartmentId equals dep.DepartmentId
+                    emp.DepartmentId equals dep.Id
                 join
                     adm in _unitOfWork.Administrations.GetAll()
                 on
-                    dep.AdministrationId equals adm.AdministrationId
+                    dep.AdministrationId equals adm.Id
                 join
                     div in _unitOfWork.Divisions.GetAll()
                 on
-                    adm.DivisionId equals div.DivisionId
+                    adm.DivisionId equals div.Id
                 where relation.EquipmentId == equipmentId &&
                     relation.EmployeeId == employeeId
                 select new OwnerInfoDTO
                 {
-                    EmployeeId = emp.EmployeeId,
-                    FullName = emp.EmployeeFullName,
-                    Room = emp.EmployeeRoom,
-                    Position = pos.PositionName,
-                    Department = dep.DepartmentName,
-                    Administration = adm.AdministrationName,
-                    Division = div.DivisionName,
+                    EmployeeId = emp.Id,
+                    FullName = emp.FullName,
+                    Room = emp.Room,
+                    Position = pos.Name,
+                    Department = dep.Name,
+                    Administration = adm.Name,
+                    Division = div.Name,
                     StartDate = relation.CreatedAt,
                     EndDate = relation.UpdatedAt,
                     IsActual = relation.IsOwner
@@ -311,9 +311,9 @@ namespace Inventory.BLL.Services
                     div in _unitOfWork.Divisions.GetAll()
                 select new DivisionEquipmentDTO
                 {
-                    Divisionid = div.DivisionId,
-                    DivisionName = div.DivisionName,
-                    Administrations = GetDivisionAdministrations(div.DivisionId)
+                    Divisionid = div.Id,
+                    DivisionName = div.Name,
+                    Administrations = GetDivisionAdministrations(div.Id)
                 });
 
             return equipments;
@@ -328,9 +328,9 @@ namespace Inventory.BLL.Services
                     adm.DivisionId == divisionId
                 select new AdministrationEquipmentDTO
                 {
-                    AdministrationId = adm.AdministrationId,
-                    AdministrationName = adm.AdministrationName,
-                    Departments = GetAdministrationDepartments(adm.AdministrationId)
+                    AdministrationId = adm.Id,
+                    AdministrationName = adm.Name,
+                    Departments = GetAdministrationDepartments(adm.Id)
                 }).ToList();
         }
 
@@ -343,9 +343,9 @@ namespace Inventory.BLL.Services
                     dep.AdministrationId == administrationId
                 select new DepartmentEquipmentDTO
                 {
-                    DepartmentId = dep.DepartmentId,
-                    DepartmentName = dep.DepartmentName,
-                    Equipments = GetDepartmentEquipments(dep.DepartmentId)
+                    DepartmentId = dep.Id,
+                    DepartmentName = dep.Name,
+                    Equipments = GetDepartmentEquipments(dep.Id)
                 }).ToList();
         }
 
@@ -365,7 +365,7 @@ namespace Inventory.BLL.Services
                 join
                     emp in _unitOfWork.Employees.GetAll()
                 on
-                    relation.EmployeeId equals emp.EmployeeId
+                    relation.EmployeeId equals emp.Id
                 where
                     emp.DepartmentId == departmentId && relation.IsOwner == true
                 select new StructuredEquipmentDTO

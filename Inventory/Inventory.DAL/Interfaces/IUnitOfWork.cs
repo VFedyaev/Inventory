@@ -1,11 +1,16 @@
 ﻿using Inventory.DAL.Entities;
 using CatalogEntities;
 using System;
+using Inventory.DAL.Identity;
+using System.Threading.Tasks;
 
 namespace Inventory.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
+        ApplicationUserManager UserManager { get; }
+        ApplicationRoleManager RoleManager { get; }
+
         IRepository<Component> Components { get; }
         IRepository<ComponentType> ComponentTypes { get; }
         IRepository<Equipment> Equipments { get; }
@@ -22,7 +27,7 @@ namespace Inventory.DAL.Interfaces
         IPartialRepository<Administration> Administrations { get; }
         IPartialRepository<Division> Divisions { get; }
 
-
+        Task SaveAsync();
         void Save();
     }
 }
