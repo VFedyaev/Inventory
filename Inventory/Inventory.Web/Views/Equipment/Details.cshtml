@@ -14,7 +14,7 @@
             <button onclick="QRCodePrint('@Model.QRCode'); return false;" class="btn btn-secondary"><i class="fa fa-print" aria-hidden="true" title="Печать" data-toggle="tooltip" data-placement="top"> Печать</i></button>
         </p>
         <p><b>@Html.DisplayNameFor(model => model.Price):</b> @Html.DisplayFor(model => model.Price)</p>
-        <p><b>Текущий владелец:</b> @Html.DisplayFor(modelItem => Model.EquipmentEmployeeRelations.Where(r => r.IsOwner == true).FirstOrDefault().Employee.EmployeeFullName)</p>
+        <p><b>Текущий владелец:</b> @Html.DisplayFor(modelItem => Model.EquipmentEmployeeRelations.Where(r => r.IsOwner == true).FirstOrDefault().Employee.FullName)</p>
     </div>
 
     <div>

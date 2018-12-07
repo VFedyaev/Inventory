@@ -55,7 +55,8 @@ namespace Inventory.BLL.Services
 
         private ModelAndViewDTO GetEquipmentFilteredListAndView(string[] words)
         {
-            var equipmentList = _unitOfWork.Equipments.GetAll().Where(e => words.All(e.InventNumber.ToLower().Contains)).ToList();
+            var all = _unitOfWork.Equipments.GetAll().ToList();
+            var equipmentList = _unitOfWork.Equipments.GetAll().Where(e => e.InventNumber != null && words.All(e.InventNumber.ToLower().Contains)).ToList();
 
             return new ModelAndViewDTO
             {

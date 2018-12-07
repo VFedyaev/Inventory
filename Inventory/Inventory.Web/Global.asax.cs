@@ -24,8 +24,7 @@ namespace Inventory.Web
 
             NinjectModule webModule = new WebModule();
             NinjectModule serviceModule = new ServiceModule("DefaultConnection");
-            NinjectModule accountModule = new AccountModule("AccountConnection");
-            var kernel = new StandardKernel(webModule, serviceModule, accountModule);
+            var kernel = new StandardKernel(webModule, serviceModule);
             kernel.Unbind<ModelValidatorProvider>();
             DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
         }

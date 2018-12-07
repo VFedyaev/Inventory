@@ -44,11 +44,6 @@ namespace Inventory.BLL.Services
             return Mapper.Map<IEnumerable<ComponentDTO>>(components);
         }
 
-        public void Add(ComponentDTO item)
-        {
-            AddAndGetId(item);
-        }
-
         public IEnumerable<ComponentDTO> GetFilteredList(FilterParamsDTO parameters)
         {
             IEnumerable<ComponentDTO> filteredComponents = GetAll();
@@ -66,6 +61,11 @@ namespace Inventory.BLL.Services
                 filteredComponents = filteredComponents.Where(c => c.Name != null && c.Name == parameters.Name);
 
             return filteredComponents.OrderBy(c => c.Name);
+        }
+
+        public void Add(ComponentDTO item)
+        {
+            AddAndGetId(item);
         }
 
         public Guid AddAndGetId(ComponentDTO componentDTO)

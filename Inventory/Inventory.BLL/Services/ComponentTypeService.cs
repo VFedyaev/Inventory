@@ -83,6 +83,7 @@ namespace Inventory.BLL.Services
 
         public bool HasRelations(Guid id)
         {
+            var components = _unitOfWork.Components.GetAll();
             var relations = _unitOfWork.Components.Find(c => c.ComponentTypeId == id);
 
             return relations.Count() > 0;

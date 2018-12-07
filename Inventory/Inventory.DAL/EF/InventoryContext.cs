@@ -1,9 +1,11 @@
 ﻿using Inventory.DAL.Entities;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
+using CatalogEntities;
 
 namespace Inventory.DAL.EF
 {
-    public class InventoryContext : DbContext
+    public class InventoryContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Component> Components { get; set; }
         public DbSet<ComponentType> ComponentTypes { get; set; }
@@ -15,11 +17,11 @@ namespace Inventory.DAL.EF
         public DbSet<RepairPlace> RepairPlaces { get; set; }
         public DbSet<StatusType> StatusTypes { get; set; }
         
-        public DbSet<CatalogEntities.Administration> Administrations { get; set; }
-        public DbSet<CatalogEntities.Department> Departments { get; set; }
-        public DbSet<CatalogEntities.Division> Divisions { get; set; }
-        public DbSet<CatalogEntities.Employee> Employees { get; set; }
-        public DbSet<CatalogEntities.Position> Positions { get; set; }
+        public DbSet<Administration> Administrations { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Division> Divisions { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Position> Positions { get; set; }
 
         public InventoryContext(string connectionString) : base(connectionString)
         {

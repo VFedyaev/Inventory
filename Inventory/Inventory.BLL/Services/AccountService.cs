@@ -16,23 +16,23 @@ namespace Inventory.BLL.Services
     {
         private const string DEFAULT_ROLE = "user";
 
-        private IAccountWorker worker { get; set; }
-        public AccountService(IAccountWorker worker)
+        private IUnitOfWork _unitOfWork { get; set; }
+        public AccountService(IUnitOfWork uow)
         {
-            this.worker = worker;
+            _unitOfWork = uow;
         }
 
         public async Task CreateUser(UserDTO userDTO)
         {
-            ApplicationUser user = await worker.UserManager.FindByEmailAsync(userDTO.UserName);
+            ApplicationUser user = await _unitOfWork.UserManager.FindByEmailAsync(userDTO.UserName);
             if (user == null)
             {
                 user = new ApplicationUser { UserName = userDTO.UserName, Email = userDTO.Email };
-                var result = await worker.UserManager.CreateAsync(user, userDTO.Password);
+                var result = await _unitOfWork.UserManager.CreateAsync(user, userDTO.Password);
                 if (result.Succeeded)
                 {
-                    await worker.UserManager.AddToRoleAsync(user.Id, (userDTO.Role ?? DEFAULT_ROLE));
-                    await worker.SaveAsync();
+                    await _unitOfWork.UserManager.AddToRoleAsync(user.Id, (userDTO.Role ?? DEFAULT_ROLE));
+                    await _unitOfWork.SaveAsync();
                 }
                 else
                 {
@@ -49,44 +49,44 @@ namespace Inventory.BLL.Services
         public async Task<ClaimsIdentity> AuthenticateUser(UserDTO userDTO)
         {
             ClaimsIdentity claim = null;
-            ApplicationUser user = await worker.UserManager.FindAsync(userDTO.UserName, userDTO.Password);
+            ApplicationUser user = await _unitOfWork.UserManager.FindAsync(userDTO.UserName, userDTO.Password);
             if (user != null)
-                claim = await worker.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+                claim = await _unitOfWork.UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
 
             return claim;
         }
 
         public async Task<UserDTO> GetUser(string id)
         {
-            ApplicationUser user = await worker.UserManager.FindByIdAsync(id.ToString());
+            ApplicationUser user = await _unitOfWork.UserManager.FindByIdAsync(id.ToString());
 
             return Mapper.Map<UserDTO>(user);
         }
 
         public IEnumerable<RoleDTO> GetAllRoles()
         {
-            var roles = worker.RoleManager.Roles.ToList();
+            var roles = _unitOfWork.RoleManager.Roles.ToList();
 
             return Mapper.Map<IEnumerable<RoleDTO>>(roles);
         }
 
         public async Task UpdateEmail(UserDTO userDTO)
         {
-            ApplicationUser user = await worker.UserManager.FindByIdAsync(userDTO.Id.ToString());
+            ApplicationUser user = await _unitOfWork.UserManager.FindByIdAsync(userDTO.Id.ToString());
             user.Email = userDTO.Email;
-            await worker.UserManager.UpdateAsync(user);
+            await _unitOfWork.UserManager.UpdateAsync(user);
 
-            await worker.SaveAsync();
+            await _unitOfWork.SaveAsync();
         }
 
         public async Task UpdatePassword(ChangePasswordDTO changePasswordDTO)
         {
-            ApplicationUser user = await worker.UserManager.FindByIdAsync(changePasswordDTO.UserId);
-            var oldPasswordConfirmation = await worker.UserManager.CheckPasswordAsync(user, changePasswordDTO.OldPassword);
+            ApplicationUser user = await _unitOfWork.UserManager.FindByIdAsync(changePasswordDTO.UserId);
+            var oldPasswordConfirmation = await _unitOfWork.UserManager.CheckPasswordAsync(user, changePasswordDTO.OldPassword);
             if (!oldPasswordConfirmation)
                 throw new OldPasswordIsWrongException();
 
-            IdentityResult result = await worker.UserManager.ChangePasswordAsync(
+            IdentityResult result = await _unitOfWork.UserManager.ChangePasswordAsync(
                 changePasswordDTO.UserId,
                 changePasswordDTO.OldPassword,
                 changePasswordDTO.NewPassword);
@@ -94,7 +94,7 @@ namespace Inventory.BLL.Services
             if (result.Errors.Any(error => error.Contains("Password")))
                 throw new InsecurePasswordException();
 
-            await worker.SaveAsync();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

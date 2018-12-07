@@ -69,25 +69,25 @@ namespace Inventory.BLL.Services
                 join
                     pos in _unitOfWork.Positions.GetAll()
                 on
-                    emp.PositionId equals pos.PositionId
+                    emp.PositionId equals pos.Id
                 join
                     dep in _unitOfWork.Departments.GetAll()
                 on
-                    emp.DepartmentId equals dep.DepartmentId
+                    emp.DepartmentId equals dep.Id
                 join
                     adm in _unitOfWork.Administrations.GetAll()
                 on
-                    dep.AdministrationId equals adm.AdministrationId
+                    dep.AdministrationId equals adm.Id
                 where
-                    emp.EmployeeFullName.IndexOf(fname, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    emp.FullName.IndexOf(fname, StringComparison.CurrentCultureIgnoreCase) >= 0
                 select new OwnerInfoDTO
                 {
-                    EmployeeId = emp.EmployeeId,
-                    FullName = emp.EmployeeFullName,
-                    Room = emp.EmployeeRoom,
-                    Position = pos.PositionName,
-                    Department = dep.DepartmentName,
-                    Administration = adm.AdministrationName
+                    EmployeeId = emp.Id,
+                    FullName = emp.FullName,
+                    Room = emp.Room,
+                    Position = pos.Name,
+                    Department = dep.Name,
+                    Administration = adm.Name
                 }).Take(10);
 
             return employees;
@@ -101,26 +101,26 @@ namespace Inventory.BLL.Services
                 join
                     pos in _unitOfWork.Positions.GetAll()
                 on
-                    emp.PositionId equals pos.PositionId
+                    emp.PositionId equals pos.Id
                 join
                     dep in _unitOfWork.Departments.GetAll()
                 on
-                    emp.DepartmentId equals dep.DepartmentId
+                    emp.DepartmentId equals dep.Id
                 join
                     adm in _unitOfWork.Administrations.GetAll()
                 on
-                    dep.AdministrationId equals adm.AdministrationId
+                    dep.AdministrationId equals adm.Id
                 where
-                    emp.EmployeeFullName.IndexOf(fname, StringComparison.CurrentCultureIgnoreCase) >= 0 &&
-                    emp.EmployeeFullName.IndexOf(lname, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    emp.FullName.IndexOf(fname, StringComparison.CurrentCultureIgnoreCase) >= 0 &&
+                    emp.FullName.IndexOf(lname, StringComparison.CurrentCultureIgnoreCase) >= 0
                 select new OwnerInfoDTO
                 {
-                    EmployeeId = emp.EmployeeId,
-                    FullName = emp.EmployeeFullName,
-                    Room = emp.EmployeeRoom,
-                    Position = pos.PositionName,
-                    Department = dep.DepartmentName,
-                    Administration = adm.AdministrationName
+                    EmployeeId = emp.Id,
+                    FullName = emp.FullName,
+                    Room = emp.Room,
+                    Position = pos.Name,
+                    Department = dep.Name,
+                    Administration = adm.Name
                 }).Take(10);
 
             return employees;
@@ -134,27 +134,27 @@ namespace Inventory.BLL.Services
                 join
                     pos in _unitOfWork.Positions.GetAll()
                 on
-                    emp.PositionId equals pos.PositionId
+                    emp.PositionId equals pos.Id
                 join
                     dep in _unitOfWork.Departments.GetAll()
                 on
-                    emp.DepartmentId equals dep.DepartmentId
+                    emp.DepartmentId equals dep.Id
                 join
                     adm in _unitOfWork.Administrations.GetAll()
                 on
-                    dep.AdministrationId equals adm.AdministrationId
+                    dep.AdministrationId equals adm.Id
                 where
-                    emp.EmployeeFullName.IndexOf(fname, StringComparison.CurrentCultureIgnoreCase) >= 0 &&
-                    emp.EmployeeFullName.IndexOf(lname, StringComparison.CurrentCultureIgnoreCase) >= 0 &&
-                    emp.EmployeeFullName.IndexOf(mname, StringComparison.CurrentCultureIgnoreCase) >= 0
+                    emp.FullName.IndexOf(fname, StringComparison.CurrentCultureIgnoreCase) >= 0 &&
+                    emp.FullName.IndexOf(lname, StringComparison.CurrentCultureIgnoreCase) >= 0 &&
+                    emp.FullName.IndexOf(mname, StringComparison.CurrentCultureIgnoreCase) >= 0
                 select new OwnerInfoDTO
                 {
-                    EmployeeId = emp.EmployeeId,
-                    FullName = emp.EmployeeFullName,
-                    Room = emp.EmployeeRoom,
-                    Position = pos.PositionName,
-                    Department = dep.DepartmentName,
-                    Administration = adm.AdministrationName
+                    EmployeeId = emp.Id,
+                    FullName = emp.FullName,
+                    Room = emp.Room,
+                    Position = pos.Name,
+                    Department = dep.Name,
+                    Administration = adm.Name
                 }).Take(10);
 
             return employees;
