@@ -27,7 +27,7 @@ namespace Inventory.DAL.Interfaces
         IPartialRepository<Administration> Administrations { get; }
         IPartialRepository<Division> Divisions { get; }
 
-        Task SaveAsync();
+        Task SaveAsync(); 
         void Save();
     }
 }
