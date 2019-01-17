@@ -161,7 +161,7 @@ namespace Inventory.BLL.Services
         {
             IEnumerable<Component> components = _unitOfWork
                 .Components
-                .Find(c => c.InventNumber.ToLower().Contains(value));
+                .Find(c => c.InventNumber != null && c.InventNumber.ToLower().Contains(value));
 
             if (components.Count() <= 0)
                 return Enumerable.Empty<ComponentDTO>();
