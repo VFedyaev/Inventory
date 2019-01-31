@@ -60,7 +60,7 @@ namespace Inventory.Web.Controllers
                 return HttpNotFound();
             }
         }
-
+        
         [Authorize(Roles = "admin, manager")]
         public ActionResult Create()
         {

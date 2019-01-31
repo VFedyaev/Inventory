@@ -37,6 +37,7 @@
         }
     </tbody>
 </table>
+<!-- Pagination -->
 @Html.PagedListPager(Model, page => Url.Action("AjaxRepairPlaceList", new { page }),
  PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "result" }))
     Страница @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) из @Model.PageCount
