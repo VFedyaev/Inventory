@@ -1,7 +1,7 @@
 ﻿const TYPE = "Тип";
 const NUMBER = "Инвентаризационный номер";
-const MODEL = "Модель";
-const NAME = "Название";
+const MODEL = "Марка";
+const NAME = "Модель";
 
 function menuInit() {
     $(document).ready(function () {

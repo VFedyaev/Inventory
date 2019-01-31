@@ -41,14 +41,6 @@
                     <div class="row" id="pinned-@component.Id">
                         <div class="col-md-8">
                             <input type="hidden" name="componentId[]" value="@component.Id" />
-                            <div class="type row item-info-row">
-                                <div class="col-md-6 item-info">
-                                    <b>Тип</b>
-                                </div>
-                                <div class="col-md-6 item-info">
-                                    @component.ComponentType.Name
-                                </div>
-                            </div>
                             <div class="number row item-info-row">
                                 <div class="col-md-6 item-info">
                                     <b>Инвентаризационный номер</b>
@@ -59,7 +51,7 @@
                             </div>
                             <div class="model row item-info-row">
                                 <div class="col-md-6 item-info">
-                                    <b>Модель</b>
+                                    <b>Марка</b>
                                 </div>
                                 <div class="col-md-6 item-info">
                                     @component.ModelName
@@ -67,10 +59,18 @@
                             </div>
                             <div class="name row item-info-row">
                                 <div class="col-md-6 item-info">
-                                    <b>Название</b>
+                                    <b>Модель</b>
                                 </div>
                                 <div class="col-md-6 item-info">
                                     @component.Name
+                                </div>
+                            </div>
+                            <div class="type row item-info-row">
+                                <div class="col-md-6 item-info">
+                                    <b>Тип</b>
+                                </div>
+                                <div class="col-md-6 item-info">
+                                    @component.ComponentType.Name
                                 </div>
                             </div>
                             <br />
